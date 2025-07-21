@@ -33,17 +33,17 @@ const Footer = () => {
                     {/* Brand Section */}
                     <div className='md:col-span-2'>
                         <Link to='/' className='flex items-center gap-2 mb-1'>
-                            <img 
-                                src="/Pmo.png" 
-                                alt="PutMeOn logo" 
+                            <img
+                                src="/Pmo.png"
+                                alt="PutMeOn logo"
                                 className="w-40 h-40 object-contain"
                             />
-                           
+
                         </Link>
                         <p className='text-muted-foreground mb-6 max-w-md'>
                             Connect with top local talent for all your service needs. From web development to event planning, find verified professionals in your area.
                         </p>
-                        
+
                         {/* Social Links */}
                         <div className='flex gap-4'>
                             {socialLinks.map((social, index) => (

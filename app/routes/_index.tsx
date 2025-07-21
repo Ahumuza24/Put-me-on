@@ -14,6 +14,7 @@ import DemoSection from '~/components/demo-section'
 import CallToAction from '~/components/call-to-action'
 import TrustSafety from '~/components/trust-safety'
 import Newsletter from '~/components/newsletter'
+import LoginForm from '~/components/pages/login/login'
 
 export const meta: MetaFunction = () => {
     return [
@@ -34,7 +35,7 @@ export const meta: MetaFunction = () => {
         },
         {
             name: 'author',
-            content: 'Nader Ferjani',
+            content: 'Cedric Ahumuza',
         },
         {
             tagName: 'link',
@@ -85,14 +86,10 @@ export const meta: MetaFunction = () => {
             content:
                 'Find and hire top local service providers including developers, designers, wedding organizers, and more. Chat, hire, and pay all in one secure platform.',
         },
-        {
-            property: 'og:image',
-            name: 'og:image',
-            content: 'https://saasstellar.nader.run/saasstellar-og-image.png',
-        },
+        
         {
             property: 'og:url',
-            content: 'https://saasstellar.nader.run/',
+            content: 'https://ahumuzacedric.netlify.app',
         },
         {
             property: 'og:type',
@@ -107,23 +104,7 @@ export const meta: MetaFunction = () => {
             content:
                 'PutMeOn - Connect with Top Local Talent',
         },
-        {
-            name: 'twitter:description',
-            content:
-                'Find and hire top local service providers including developers, designers, wedding organizers, and more. Chat, hire, and pay all in one secure platform.',
-        },
-        {
-            name: 'twitter:image',
-            content: 'https://saasstellar.nader.run/saasstellar-og-image.png',
-        },
-        {
-            name: 'twitter:url',
-            content: 'https://saasstellar.nader.run/',
-        },
-        {
-            name: 'twitter:domain',
-            content: 'saasstellar.nader.run',
-        },
+        
     ]
 }
 
@@ -134,16 +115,16 @@ export default function Index() {
             <Hero />
             <HowItWorks />
             <FeaturedCategories />
-            <Testimonials />
+            {/* <Testimonials /> */}
             <WhyChooseUs />
             <PricingSection />
-            <TopTalent />
-            <DemoSection />
+            {/* <TopTalent /> */}
+            {/* <DemoSection /> */}
             <CallToAction />
             <TrustSafety />
             <Newsletter />
-                   
             <Footer />
         </div>
+       
     )
 }

@@ -6,11 +6,12 @@ import { Input } from './ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'
 import useTheme from '~/hooks/use-theme'
 import { useState, useEffect } from 'react'
+import DotPattern from './dot-pattern'
 
 const Hero = () => {
     const [theme] = useTheme()
     const [currentSlide, setCurrentSlide] = useState(0)
-    
+
     const slides = [
         {
             title: "Hire Top Local Talent",
@@ -69,6 +70,19 @@ const Hero = () => {
                     className="absolute bottom-20 right-10 w-32 h-32 bg-primary/5 rounded-full blur-2xl"
                 />
             </div>
+            {/* Full-width Dot Pattern Background */}
+            <div className="absolute inset-0 w-screen left-1/2 transform -translate-x-1/2 pointer-events-none">
+                <DotPattern
+                    width={20}
+                    height={20}
+                    cx={1}
+                    cy={1}
+                    cr={1}
+                    className={cn(
+                        'fill-primary/30 [mask-image:linear-gradient(to_bottom,transparent,white,white,transparent,transparent)]'
+                    )}
+                />
+            </div>
 
             {/* Hero Content with Slideshow */}
             <div className="relative z-10">
@@ -109,7 +123,7 @@ const Hero = () => {
                                 {slides[currentSlide].subtitle}
                             </span>
                         </motion.h1>
-                        
+
                         <motion.p
                             className='text-lg text-muted-foreground max-w-2xl mx-auto'
                         >
@@ -158,15 +172,15 @@ const Hero = () => {
                                 </SelectContent>
                             </Select>
                         </div>
-                        
+
                         <div className="flex-1 relative">
                             <MapPinIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                            <Input 
-                                placeholder="Enter your location" 
+                            <Input
+                                placeholder="Enter your location"
                                 className="h-12 pl-10"
                             />
                         </div>
-                        
+
                         <Button size="lg" className="h-12 px-8">
                             <SearchIcon className="h-5 w-5 mr-2" />
                             Search
