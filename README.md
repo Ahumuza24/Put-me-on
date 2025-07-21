@@ -1,3 +1,4 @@
+
 Software Requirements Specification (SRS)
 1. Introduction
 1.1 Purpose
@@ -179,4 +180,6 @@ ________________________________________
 •	CRUD: Basic operations in persistent storage (Create, Read, Update, Delete).
 •	MVP: The initial version of the product with essential features.
 •	CDN: Content Delivery Network for faster asset delivery.
+
+
 
