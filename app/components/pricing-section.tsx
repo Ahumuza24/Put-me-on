@@ -1,188 +1,179 @@
-import { motion } from 'framer-motion'
-import { CheckIcon, XIcon } from 'lucide-react'
+import { CheckIcon } from 'lucide-react'
 import { Button } from './ui/button'
+import { Switch } from './ui/switch'
+import { Label } from './ui/label'
+import { Badge } from './ui/badge'
+import { useState } from 'react'
+import { cn } from '~/lib/utils'
 
 const PricingSection = () => {
+    const [isAnnual, setIsAnnual] = useState(false)
+
     const plans = [
         {
             name: "Basic",
-            price: "Free",
+            monthlyPrice: 0,
+            annualPrice: 0,
             description: "Perfect for getting started",
             features: [
                 "Create basic profile",
-                "Browse services",
+                "Browse services", 
                 "Send up to 5 messages/month",
                 "Basic search filters",
-                "Community support"
-            ],
-            limitations: [
-                "No featured listings",
-                "Limited portfolio uploads",
-                "No priority support"
+                "Community support",
+                "Email support"
             ],
             cta: "Get Started",
-            popular: false
+            popular: false,
+            gradient: "from-primary/10 via-transparent to-transparent",
+            borderGradient: "before:from-primary/30 before:to-primary/5"
         },
         {
-            name: "Professional",
-            price: "UGX 69,350",
-            period: "/month",
+            name: "Professional", 
+            monthlyPrice: 19,
+            annualPrice: 193, // 15% discount
             description: "For active service providers",
             features: [
                 "Everything in Basic",
                 "Unlimited messaging",
-                "Featured profile listings",
+                "Featured profile listings", 
                 "Advanced portfolio showcase",
                 "Priority search ranking",
                 "Analytics dashboard",
-                "Email support",
-                "Custom profile URL"
-            ],
-            limitations: [
-                "5% transaction fee"
+                "Custom profile URL",
+                "Priority email support"
             ],
             cta: "Start Free Trial",
-            popular: true
+            popular: true,
+            gradient: "from-primary/10 via-transparent to-transparent",
+            borderGradient: "before:from-primary before:to-primary/10"
         },
         {
             name: "Enterprise",
-            price: "UGX 178,850",
-            period: "/month",
+            monthlyPrice: 49,
+            annualPrice: 499, // 15% discount  
             description: "For agencies and teams",
             features: [
                 "Everything in Professional",
                 "Team collaboration tools",
                 "White-label options",
-                "API access",
+                "API access", 
                 "Dedicated account manager",
                 "Custom integrations",
-                "Priority support",
+                "24/7 priority support",
                 "Advanced reporting"
             ],
-            limitations: [],
             cta: "Contact Sales",
-            popular: false
+            popular: false,
+            gradient: "from-primary/10 via-transparent to-transparent", 
+            borderGradient: "before:from-primary/30 before:to-primary/5"
         }
     ]
 
     return (
-        <section className="py-20 px-5">
-            <div className="max-w-7xl mx-auto">
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.6 }}
-                    className="text-center mb-16"
-                >
-                    <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                        Simple, Transparent Pricing
-                    </h2>
-                    <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                        Choose the plan that fits your needs. Start free and upgrade as you grow.
-                    </p>
-                </motion.div>
-
-                <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+        <section className='mx-auto mb-8 mt-0 px-5 dark:bg-[radial-gradient(ellipse_40%_50%_at_50%_-20%,hsla(var(--primary)_/_30%),#ffffff00)]'>
+            <div className='mx-auto mb-16 h-[1px] w-full max-w-2xl bg-gradient-to-r from-transparent via-primary to-transparent'></div>
+            <div className='mx-auto flex max-w-7xl flex-col gap-6 text-center'>
+                <div>
+                    <span className='rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-sm font-medium text-primary dark:bg-primary/25'>
+                        <span className='brightness-[1.7]'>
+                            Simple Pricing
+                        </span>
+                    </span>
+                    <h1 className='mt-4 scroll-m-20 font-inter text-4xl font-extrabold tracking-tight lg:text-5xl'>
+                        <span className='bg-gradient-to-b from-foreground to-foreground/70 bg-clip-text text-transparent'>
+                            Choose{' '}
+                        </span>
+                        <span className='bg-gradient-to-b from-foreground to-foreground/70 bg-clip-text text-transparent'>
+                            your{' '}
+                        </span>
+                        <span className='bg-gradient-to-b from-foreground to-foreground/70 bg-clip-text text-transparent'>
+                            plan
+                        </span>
+                    </h1>
+                </div>
+                <p className='text-lg text-muted-foreground'>
+                    Start free and upgrade as you grow your business
+                </p>
+                <div className='mt-20 flex items-center justify-center space-x-2'>
+                    <Label
+                        htmlFor='price-toggle'
+                        className={cn(isAnnual && 'text-muted-foreground')}
+                    >
+                        Monthly
+                    </Label>
+                    <Switch
+                        id='price-toggle'
+                        defaultChecked={false}
+                        checked={isAnnual}
+                        onCheckedChange={() => setIsAnnual(!isAnnual)}
+                        className='data-[state=unchecked]:bg-primary'
+                        aria-label='toggle pricing'
+                    />
+                    <Label
+                        htmlFor='price-toggle'
+                        className={cn(!isAnnual && 'text-muted-foreground')}
+                    >
+                        Annually
+                    </Label>
+                </div>
+                <div className='mt-10 flex flex-col items-center gap-6 lg:flex-row lg:items-stretch lg:justify-around lg:px-6'>
                     {plans.map((plan, index) => (
-                        <motion.div
+                        <div 
                             key={index}
-                            initial={{ opacity: 0, y: 30 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ duration: 0.6, delay: index * 0.1 }}
-                            whileHover={{ y: -5 }}
-                            className={`relative bg-background rounded-2xl p-8 border shadow-sm hover:shadow-lg transition-all duration-300 ${
-                                plan.popular ? 'border-primary shadow-primary/10' : ''
-                            }`}
+                            className={cn(
+                                'gradient-border relative w-full max-w-sm flex-grow basis-0 rounded-md bg-gradient-to-bl p-8 text-left lg:max-w-none',
+                                plan.gradient,
+                                plan.borderGradient,
+                                index === 0 && 'before:bg-gradient-to-bl',
+                                index === 1 && 'before:bg-gradient-to-b', 
+                                index === 2 && 'before:bg-gradient-to-br'
+                            )}
                         >
                             {plan.popular && (
                                 <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                                    <div className="bg-primary text-primary-foreground px-4 py-1 rounded-full text-sm font-medium">
+                                    <Badge className="bg-primary text-primary-foreground">
                                         Most Popular
-                                    </div>
+                                    </Badge>
                                 </div>
                             )}
-
-                            <div className="text-center mb-8">
-                                <h3 className="text-2xl font-bold mb-2">{plan.name}</h3>
-                                <div className="mb-2">
-                                    <span className="text-4xl font-bold">{plan.price}</span>
-                                    {plan.period && (
-                                        <span className="text-muted-foreground">{plan.period}</span>
-                                    )}
+                            
+                            <div className='flex flex-col gap-3 text-left'>
+                                <p className="text-lg font-medium">{plan.name}</p>
+                                <div className='flex items-start gap-2'>
+                                    <span className='text-2xl text-muted-foreground'>
+                                        $
+                                    </span>
+                                    <span className='flex items-center gap-2 bg-gradient-to-b from-foreground to-foreground/70 bg-clip-text text-5xl font-medium text-transparent'>
+                                        {isAnnual ? plan.annualPrice : plan.monthlyPrice}
+                                        {isAnnual && plan.monthlyPrice > 0 && (
+                                            <Badge variant={'outline'}>
+                                                SAVE 15%
+                                            </Badge>
+                                        )}
+                                    </span>
                                 </div>
-                                <p className="text-muted-foreground">{plan.description}</p>
+                                <p className='text-muted-foreground'>
+                                    {plan.description}
+                                </p>
                             </div>
-
-                            <div className="space-y-4 mb-8">
+                            <ul className='mt-8 flex flex-col gap-4'>
                                 {plan.features.map((feature, i) => (
-                                    <div key={i} className="flex items-start gap-3">
-                                        <CheckIcon className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
-                                        <span className="text-sm">{feature}</span>
-                                    </div>
+                                    <li key={i} className='flex gap-2'>
+                                        <CheckIcon className='mt-0.5 h-5 w-5 shrink-0 text-primary' />
+                                        <span>{feature}</span>
+                                    </li>
                                 ))}
-                                
-                                {plan.limitations.map((limitation, i) => (
-                                    <div key={i} className="flex items-start gap-3">
-                                        <XIcon className="w-5 h-5 text-muted-foreground mt-0.5 flex-shrink-0" />
-                                        <span className="text-sm text-muted-foreground">{limitation}</span>
-                                    </div>
-                                ))}
-                            </div>
-
-                            <motion.div
-                                whileHover={{ scale: 1.02 }}
-                                whileTap={{ scale: 0.98 }}
+                            </ul>
+                            <Button 
+                                className='mt-8 w-full' 
+                                variant={plan.popular ? 'default' : 'outline'}
                             >
-                                <Button 
-                                    className={`w-full ${plan.popular ? '' : 'variant-outline'}`}
-                                    variant={plan.popular ? 'default' : 'outline'}
-                                    size="lg"
-                                >
-                                    {plan.cta}
-                                </Button>
-                            </motion.div>
-                        </motion.div>
+                                {plan.cta}
+                            </Button>
+                        </div>
                     ))}
                 </div>
-
-                {/* FAQ Section */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.6, delay: 0.4 }}
-                    className="mt-16 text-center"
-                >
-                    <h3 className="text-xl font-semibold mb-4">Frequently Asked Questions</h3>
-                    <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto text-left">
-                        <div>
-                            <h4 className="font-medium mb-2">Can I change plans anytime?</h4>
-                            <p className="text-muted-foreground text-sm">
-                                Yes, you can upgrade or downgrade your plan at any time. Changes take effect immediately.
-                            </p>
-                        </div>
-                        <div>
-                            <h4 className="font-medium mb-2">Is there a free trial?</h4>
-                            <p className="text-muted-foreground text-sm">
-                                Professional plan comes with a 14-day free trial. No credit card required.
-                            </p>
-                        </div>
-                        <div>
-                            <h4 className="font-medium mb-2">What payment methods do you accept?</h4>
-                            <p className="text-muted-foreground text-sm">
-                                We accept all major credit cards, PayPal, and bank transfers for Enterprise plans.
-                            </p>
-                        </div>
-                        <div>
-                            <h4 className="font-medium mb-2">Can I cancel anytime?</h4>
-                            <p className="text-muted-foreground text-sm">
-                                Yes, you can cancel your subscription at any time. No long-term contracts or cancellation fees.
-                            </p>
-                        </div>
-                    </div>
-                </motion.div>
             </div>
         </section>
     )

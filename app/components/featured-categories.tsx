@@ -1,43 +1,50 @@
 import { motion } from 'framer-motion'
 import { CodeIcon, PaletteIcon, HeartIcon, PenToolIcon, CameraIcon, TrendingUpIcon } from 'lucide-react'
+import FeatureCard from './feature-card'
 
 const FeaturedCategories = () => {
     const categories = [
         {
-            icon: CodeIcon,
+            icon: <CodeIcon className="w-8 h-8 text-blue-600" />,
             title: "Web Development",
             description: "Custom websites, web apps, and e-commerce solutions",
-            count: "150+ providers"
+            count: "150+ providers",
+            backgroundColor: 'from-blue-500/20 to-blue-500/5',
         },
         {
-            icon: PaletteIcon,
+            icon: <PaletteIcon className="w-8 h-8 text-purple-600" />,
             title: "Graphic Design",
             description: "Logos, branding, print design, and digital graphics",
-            count: "200+ providers"
+            count: "200+ providers",
+            backgroundColor: 'from-purple-500/20 to-purple-500/5',
         },
         {
-            icon: HeartIcon,
+            icon: <HeartIcon className="w-8 h-8 text-pink-600" />,
             title: "Events & Weddings",
             description: "Wedding planning, event coordination, and party services",
-            count: "80+ providers"
+            count: "80+ providers",
+            backgroundColor: 'from-pink-500/20 to-pink-500/5',
         },
         {
-            icon: PenToolIcon,
+            icon: <PenToolIcon className="w-8 h-8 text-green-600" />,
             title: "Content Writing",
             description: "Blog posts, copywriting, technical writing, and editing",
-            count: "120+ providers"
+            count: "120+ providers",
+            backgroundColor: 'from-green-500/20 to-green-500/5',
         },
         {
-            icon: CameraIcon,
+            icon: <CameraIcon className="w-8 h-8 text-orange-600" />,
             title: "Photography & Video",
             description: "Event photography, product shoots, and video production",
-            count: "90+ providers"
+            count: "90+ providers",
+            backgroundColor: 'from-orange-500/20 to-orange-500/5',
         },
         {
-            icon: TrendingUpIcon,
+            icon: <TrendingUpIcon className="w-8 h-8 text-red-600" />,
             title: "Marketing",
             description: "Digital marketing, SEO, social media, and advertising",
-            count: "110+ providers"
+            count: "110+ providers",
+            backgroundColor: 'from-red-500/20 to-red-500/5',
         }
     ]
 
@@ -67,36 +74,29 @@ const FeaturedCategories = () => {
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ duration: 0.6, delay: index * 0.1 }}
-                            whileHover={{ 
+                            whileHover={{
                                 scale: 1.05,
                                 transition: { duration: 0.2 }
                             }}
                             className="group cursor-pointer"
                         >
-                            <div className="bg-background rounded-xl p-6 shadow-sm border hover:shadow-lg transition-all duration-300">
-                                <motion.div
-                                    whileHover={{ scale: 1.1, rotate: 5 }}
-                                    className="w-16 h-16 mb-4 bg-primary/10 rounded-lg flex items-center justify-center group-hover:bg-primary/20 transition-colors"
-                                >
-                                    <category.icon className="w-8 h-8 text-primary" />
-                                </motion.div>
+                            <div className="relative">
+                                <FeatureCard
+                                    title={category.title}
+                                    description={category.description}
+                                    icon={category.icon}
+                                    backgroundColor={category.backgroundColor}
+                                />
                                 
-                                <h3 className="text-xl font-semibold mb-2 group-hover:text-primary transition-colors">
-                                    {category.title}
-                                </h3>
-                                
-                                <p className="text-muted-foreground mb-4">
-                                    {category.description}
-                                </p>
-                                
-                                <div className="flex items-center justify-between">
-                                    <span className="text-sm text-primary font-medium">
+                                {/* Provider count overlay */}
+                                <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between">
+                                    <span className="text-sm text-primary font-medium bg-background/80 backdrop-blur-sm px-2 py-1 rounded">
                                         {category.count}
                                     </span>
                                     <motion.span
                                         initial={{ x: -10, opacity: 0 }}
                                         whileHover={{ x: 0, opacity: 1 }}
-                                        className="text-sm text-primary font-medium"
+                                        className="text-sm text-primary font-medium bg-background/80 backdrop-blur-sm px-2 py-1 rounded"
                                     >
                                         Explore →
                                     </motion.span>

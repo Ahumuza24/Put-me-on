@@ -1,19 +1,6 @@
 import { Link } from '@remix-run/react'
-import { GithubIcon } from 'lucide-react'
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '~/components/ui/select'
-import useTheme, { changeTheme } from '~/hooks/use-theme'
-import { cn } from '~/lib/utils'
-import { type ThemeName } from '~/registry/themes'
-import Saastellar from './icons/saasstellar'
 
 const Navbar = () => {
-    const [theme, setTheme] = useTheme()
     return (
         <div className='sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b px-5 py-2 shadow-sm'>
             <nav className='mx-auto flex max-w-7xl items-center justify-between'>
@@ -56,7 +43,7 @@ const Navbar = () => {
                     </Link>
                     
                     <Link 
-                        to='/signup' 
+                        to='/login' 
                         className='hidden sm:inline-flex h-9 px-4 py-2 bg-primary text-primary-foreground hover:bg-primary/90 rounded-md text-sm font-medium transition-colors'
                     >
                         Login
