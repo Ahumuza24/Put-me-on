@@ -25,7 +25,7 @@ const PricingSection = () => {
         },
         {
             name: "Professional",
-            price: "$19",
+            price: "UGX 69,350",
             period: "/month",
             description: "For active service providers",
             features: [
@@ -46,7 +46,7 @@ const PricingSection = () => {
         },
         {
             name: "Enterprise",
-            price: "$49",
+            price: "UGX 178,850",
             period: "/month",
             description: "For agencies and teams",
             features: [

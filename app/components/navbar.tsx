@@ -55,6 +55,13 @@ const Navbar = () => {
                         Get Started
                     </Link>
                     
+                    <Link 
+                        to='/signup' 
+                        className='hidden sm:inline-flex h-9 px-4 py-2 bg-primary text-primary-foreground hover:bg-primary/90 rounded-md text-sm font-medium transition-colors'
+                    >
+                        Login
+                    </Link>
+
                 </div>
             </nav>
         </div>
