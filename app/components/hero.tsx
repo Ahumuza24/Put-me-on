@@ -1,5 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { SearchIcon, MapPinIcon } from 'lucide-react'
+import { Link } from '@remix-run/react'
 import { cn } from '~/lib/utils'
 import { Button } from './ui/button'
 import { Input } from './ui/input'
@@ -141,11 +142,11 @@ const Hero = () => {
                     transition={{ duration: 0.5, delay: 0.3 }}
                     className="flex flex-col sm:flex-row gap-4 justify-center mt-8"
                 >
-                    <Button size="lg" className="text-lg px-8 py-6">
-                        Find Services
+                    <Button size="lg" className="text-lg px-8 py-6" asChild>
+                        <Link to="/signup">Find Services</Link>
                     </Button>
-                    <Button variant="outline" size="lg" className="text-lg px-8 py-6">
-                        Become a Provider
+                    <Button variant="outline" size="lg" className="text-lg px-8 py-6" asChild>
+                        <Link to="/signup">Become a Provider</Link>
                     </Button>
                 </motion.div>
 
