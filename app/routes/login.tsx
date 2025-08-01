@@ -11,6 +11,7 @@ export const meta: MetaFunction = () => {
     ]
 }
 
+
 export default function Login() {
     return (
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/20 via-background to-primary/10 px-4">
