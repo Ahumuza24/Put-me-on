@@ -6,11 +6,11 @@
 
 @layer base {
     :root {
-        --background: 0 0% 100%;
+        --background: 39 14% 92%; /* #F0EEE6 converted to HSL */
         --foreground: 20 14.3% 4.1%;
-        --card: 0 0% 100%;
+        --card: 39 14% 92%;
         --card-foreground: 20 14.3% 4.1%;
-        --popover: 0 0% 100%;
+        --popover: 39 14% 92%;
         --popover-foreground: 20 14.3% 4.1%;
         --primary: 24.6 95% 53.1%;
         --primary-foreground: 60 9.1% 97.8%;

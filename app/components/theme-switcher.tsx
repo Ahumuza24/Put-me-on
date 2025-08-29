@@ -29,6 +29,19 @@ export default function ThemeSwitcher() {
       document.documentElement.classList.remove('dark')
       localStorage.setItem('darkMode', 'false')
     }
+    
+    // Apply current theme with new mode immediately
+    const themeObject: any = themes.find((t) => t.name === theme)
+    if (themeObject) {
+      const root = document.documentElement
+      const modeVars = newDarkMode ? themeObject.cssVars.dark : themeObject.cssVars.light
+      Object.keys(modeVars).forEach((property) => {
+        root.style.setProperty(
+          `--${property}`,
+          modeVars[property]
+        )
+      })
+    }
   }
 
   return (
