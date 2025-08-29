@@ -32,7 +32,14 @@ export default function App() {
     const { ENV } = useLoaderData<typeof loader>()
     useEffect(() => {
         if (typeof window !== 'undefined') {
+            // Apply theme
             changeTheme(getTheme())
+            
+            // Check dark mode preference
+            const darkMode = localStorage.getItem('darkMode')
+            if (darkMode === 'false') {
+                document.documentElement.classList.remove('dark')
+            }
         }
     }, [])
     return (

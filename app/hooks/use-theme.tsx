@@ -15,19 +15,19 @@ export const changeTheme = (theme: string) => {
 }
 
 export const getTheme = (): ThemeName => {
-    let theme: ThemeName = 'orange'
+    let theme: ThemeName = 'anthropic'
     if (typeof window !== 'undefined') {
         theme = localStorage.getItem('theme') as ThemeName
         if (theme !== null) {
             theme = theme.replace(/['"]+/g, '') as ThemeName
             return theme
         }
-        return 'orange'
+        return 'anthropic'
     }
     return theme
 }
 
-const themeAtom = atomWithStorage<ThemeName>('theme', 'orange')
+const themeAtom = atomWithStorage<ThemeName>('theme', 'anthropic')
 
 export default function useTheme() {
     return useAtom(themeAtom)
