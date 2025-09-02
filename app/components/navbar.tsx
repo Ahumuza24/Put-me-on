@@ -1,4 +1,5 @@
 import { Link } from '@remix-run/react'
+import ThemeSwitcher from '~/components/theme-switcher'
 
 const Navbar = () => {
     return (
@@ -35,6 +36,7 @@ const Navbar = () => {
                     </Link>
                 </div>
                 <div className='flex items-center gap-3'>
+                    <ThemeSwitcher />
                     <Link 
                         to='/signup' 
                         className='hidden sm:inline-flex h-9 px-4 py-2 bg-primary text-primary-foreground hover:bg-primary/90 rounded-md text-sm font-medium transition-colors'
@@ -48,7 +50,6 @@ const Navbar = () => {
                     >
                         Login
                     </Link>
-
                 </div>
             </nav>
         </div>
