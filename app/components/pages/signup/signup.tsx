@@ -6,6 +6,8 @@ import { Input } from '~/components/ui/input';
 import { Label } from '~/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/ui/select';
 import { useAuth } from '~/context/AuthContext';
+import { profileStorage } from '~/lib/profile-storage';
+import { supabase } from '~/lib/supabase.client';
 
 const SignupForm: React.FC = () => {
     const [userType, setUserType] = useState<'client' | 'provider'>('client');
@@ -21,7 +23,7 @@ const SignupForm: React.FC = () => {
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
     
-    const { signUp } = useAuth();
+    const { signUp, refreshProfile } = useAuth();
     const navigate = useNavigate();
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -56,23 +58,108 @@ const SignupForm: React.FC = () => {
         }
 
         try {
-            const { error: signUpError } = await signUp(email, password);
+            console.log('Starting signup process...')
+            const { data: signUpData, error: signUpError } = await signUp(email, password);
 
             if (signUpError) {
+                console.error('Signup error:', signUpError)
                 setError(signUpError.message);
             } else {
+                console.log('Signup successful:', signUpData)
                 setSuccess('Account created successfully! Check your email for confirmation.');
                 
-                // Store additional user data (you might want to save this to a profiles table)
-                const userProfile = {
-                    full_name: fullName,
-                    phone,
-                    location,
-                    user_type: userType,
-                    ...(userType === 'provider' && { service_category: category })
-                };
-                
-                console.log('User profile data to save:', userProfile);
+                // Store user profile data
+                if (signUpData?.user) {
+                    try {
+                        console.log('Creating profile for user:', signUpData.user.id, 'with data:', {
+                            fullName,
+                            email,
+                            phone,
+                            location,
+                            userType,
+                            serviceCategory: userType === 'provider' ? category : undefined
+                        });
+                        
+                        // Wait for user session to be established
+                        console.log('Waiting for user session to be established...');
+                        await new Promise(resolve => setTimeout(resolve, 2000));
+                        
+                        // Check if user is authenticated
+                        const { data: { user: authUser } } = await supabase.auth.getUser();
+                        console.log('Current authenticated user:', authUser?.id);
+                        
+                        if (!authUser) {
+                            throw new Error('User not authenticated after signup');
+                        }
+                        
+                        if (authUser.id !== signUpData.user.id) {
+                            throw new Error('User ID mismatch after signup');
+                        }
+                        
+                        console.log('User is properly authenticated, creating profile...');
+                        
+                        const createdProfile = await profileStorage.create({
+                            userId: signUpData.user.id,
+                            fullName,
+                            email,
+                            phone,
+                            location,
+                            userType,
+                            serviceCategory: userType === 'provider' ? category : undefined,
+                            bio: '',
+                            hourlyRate: 0,
+                            experience: '',
+                            skills: [],
+                            portfolio: [],
+                            availability: true,
+                            verified: false,
+                            rating: 0,
+                            completedJobs: 0
+                        });
+                        
+                        console.log('Profile created successfully:', createdProfile);
+                        
+                        // Refresh the profile in AuthContext
+                        await refreshProfile();
+                    } catch (profileError) {
+                        console.error('Error creating profile:', profileError);
+                        console.error('Profile error details:', {
+                            message: profileError.message,
+                            details: profileError.details,
+                            hint: profileError.hint,
+                            code: profileError.code
+                        });
+                        
+                        // Store in localStorage as fallback
+                        console.log('Storing profile in localStorage as fallback');
+                        const fallbackProfile = {
+                            id: `profile_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+                            userId: signUpData.user.id,
+                            fullName,
+                            email,
+                            phone,
+                            location,
+                            userType,
+                            serviceCategory: userType === 'provider' ? category : undefined,
+                            bio: '',
+                            hourlyRate: 0,
+                            experience: '',
+                            skills: [],
+                            portfolio: [],
+                            availability: true,
+                            verified: false,
+                            rating: 0,
+                            completedJobs: 0,
+                            avatarUrl: '',
+                            createdAt: new Date().toISOString(),
+                            updatedAt: new Date().toISOString()
+                        };
+                        
+                        if (typeof window !== 'undefined') {
+                            localStorage.setItem(`profile_${signUpData.user.id}`, JSON.stringify(fallbackProfile));
+                        }
+                    }
+                }
                 
                 // Clear form
                 setFullName('');
@@ -84,13 +171,18 @@ const SignupForm: React.FC = () => {
                 setConfirmPassword('');
                 setTermsAccepted(false);
                 
-                // Redirect to login after 3 seconds
+                // Redirect to appropriate dashboard based on user type
                 setTimeout(() => {
-                    navigate('/login');
-                }, 3000);
+                    if (userType === 'provider') {
+                        navigate('/provider/dashboard');
+                    } else {
+                        navigate('/dashboard');
+                    }
+                }, 2000);
             }
         } catch (err) {
-            setError('An unexpected error occurred. Please try again.');
+            console.error('Unexpected signup error:', err)
+            setError(`An unexpected error occurred: ${err.message || 'Please try again.'}`);
         } finally {
             setLoading(false);
         }
@@ -231,7 +323,7 @@ const SignupForm: React.FC = () => {
                             <Input 
                                 id="location"
                                 type="text" 
-                                placeholder='Enter your city or area' 
+                                placeholder='Enter your city (e.g., Kampala, Entebbe, Jinja)' 
                                 required 
                                 className="pl-10"
                                 value={location}

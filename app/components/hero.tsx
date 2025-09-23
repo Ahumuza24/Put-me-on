@@ -1,4 +1,3 @@
-import { motion, AnimatePresence } from 'framer-motion'
 import { SearchIcon, MapPinIcon } from 'lucide-react'
 import { Link } from '@remix-run/react'
 import { cn } from '~/lib/utils'
@@ -44,30 +43,10 @@ const Hero = () => {
         <main className='relative mx-auto flex min-h-[calc(100vh-73px)] max-w-7xl flex-col justify-center gap-8 px-5 text-center lg:my-0'>
             {/* Animated Background Shapes */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                <motion.div
-                    animate={{
-                        x: [0, 100, 0],
-                        y: [0, -50, 0],
-                        rotate: [0, 180, 360],
-                    }}
-                    transition={{
-                        duration: 20,
-                        repeat: Infinity,
-                        ease: "linear"
-                    }}
+                <div
                     className="absolute top-20 left-10 w-20 h-20 bg-primary/10 rounded-full blur-xl"
                 />
-                <motion.div
-                    animate={{
-                        x: [0, -80, 0],
-                        y: [0, 60, 0],
-                        rotate: [0, -180, -360],
-                    }}
-                    transition={{
-                        duration: 25,
-                        repeat: Infinity,
-                        ease: "linear"
-                    }}
+                <div
                     className="absolute bottom-20 right-10 w-32 h-32 bg-primary/5 rounded-full blur-2xl"
                 />
             </div>
@@ -87,16 +66,11 @@ const Hero = () => {
 
             {/* Hero Content with Slideshow */}
             <div className="relative z-10">
-                <AnimatePresence mode="wait">
-                    <motion.div
+                    <div
                         key={currentSlide}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -20 }}
-                        transition={{ duration: 0.5 }}
                         className="space-y-6"
                     >
-                        <motion.h1
+                        <h1
                             className={cn(
                                 'scroll-m-20 font-inter text-4xl font-extrabold tracking-tight lg:text-6xl'
                             )}
@@ -123,38 +97,31 @@ const Hero = () => {
                             >
                                 {slides[currentSlide].subtitle}
                             </span>
-                        </motion.h1>
+                        </h1>
 
-                        <motion.p
+                        <p
                             className='text-lg text-muted-foreground max-w-2xl mx-auto'
                         >
                             {slides[currentSlide].description}
-                        </motion.p>
-                    </motion.div>
-                </AnimatePresence>
+                        </p>
+                    </div>
 
 
 
                 {/* CTA Buttons */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: 0.3 }}
+                <div
                     className="flex flex-col sm:flex-row gap-4 justify-center mt-8"
                 >
-                    <Button size="lg" className="text-lg px-8 py-6" asChild>
-                        <Link to="/signup">Find Services</Link>
+                    <Button size="lg" className="text-lg px-8 py-6 whitespace-nowrap" asChild>
+                        <Link to="/signup">Get Started</Link>
                     </Button>
                     <Button variant="outline" size="lg" className="text-lg px-8 py-6" asChild>
-                        <Link to="/signup">Become a Provider</Link>
+                        <Link to="/become-provider">Become a Provider</Link>
                     </Button>
-                </motion.div>
+                </div>
 
                 {/* Search Bar */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: 0.5 }}
+                <div
                     className="max-w-4xl mx-auto mt-12"
                 >
                     <div className="flex flex-col md:flex-row gap-4 p-6 bg-background/50 backdrop-blur-sm border rounded-2xl shadow-lg">
@@ -177,7 +144,7 @@ const Hero = () => {
                         <div className="flex-1 relative">
                             <MapPinIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                             <Input
-                                placeholder="Enter your location"
+                                placeholder="Enter your city (e.g., Kampala, Entebbe, Jinja)"
                                 className="h-12 pl-10"
                             />
                         </div>
@@ -187,7 +154,7 @@ const Hero = () => {
                             Search
                         </Button>
                     </div>
-                </motion.div>
+                </div>
             </div>
         </main>
     )

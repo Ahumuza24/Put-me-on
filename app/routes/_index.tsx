@@ -14,7 +14,7 @@ import DemoSection from '~/components/demo-section'
 import CallToAction from '~/components/call-to-action'
 import TrustSafety from '~/components/trust-safety'
 import Newsletter from '~/components/newsletter'
-import LoginForm from '~/components/pages/login/login'
+import AuthRedirect from '~/components/AuthRedirect'
 
 export const meta: MetaFunction = () => {
     return [
@@ -110,21 +110,22 @@ export const meta: MetaFunction = () => {
 
 export default function Index() {
     return (
-        <div className='dark:bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,hsla(var(--primary)_/_30%),#ffffff00)]'>
-            <Navbar />
-            <Hero />
-            <HowItWorks />
-            <FeaturedCategories />
-            {/* <Testimonials /> */}
-            <WhyChooseUs />
-            <PricingSection />
-            {/* <TopTalent /> */}
-            {/* <DemoSection /> */}
-            <CallToAction />
-            <TrustSafety />
-            <Newsletter />
-            <Footer />
-        </div>
-       
+        <AuthRedirect>
+            <div className='dark:bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,hsla(var(--primary)_/_30%),#ffffff00)]'>
+                <Navbar />
+                <Hero />
+                <HowItWorks />
+                <FeaturedCategories />
+                {/* <Testimonials /> */}
+                <WhyChooseUs />
+                <PricingSection />
+                {/* <TopTalent /> */}
+                {/* <DemoSection /> */}
+                <CallToAction />
+                <TrustSafety />
+                <Newsletter />
+                <Footer />
+            </div>
+        </AuthRedirect>
     )
 }

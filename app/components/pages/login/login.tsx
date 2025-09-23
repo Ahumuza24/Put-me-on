@@ -5,6 +5,7 @@ import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
 import { Label } from '~/components/ui/label';
 import { supabase } from '~/lib/supabase.client';
+import { profileStorage } from '~/lib/profile-storage';
 
 const LoginForm: React.FC = () => {
     const [email, setEmail] = useState('');
@@ -27,9 +28,27 @@ const LoginForm: React.FC = () => {
 
             if (signInError) {
                 setError(signInError.message);
-            } else {
-                // Login successful - redirect to dashboard
-                navigate('/dashboard');
+            } else if (data.user) {
+                // Login successful - check user profile and redirect based on role
+                try {
+                    const profile = await profileStorage.getByUserId(data.user.id);
+                    
+                    if (profile) {
+                        // Redirect based on user type
+                        if (profile.userType === 'provider') {
+                            navigate('/provider/dashboard');
+                        } else {
+                            navigate('/dashboard');
+                        }
+                    } else {
+                        // No profile found, redirect to general dashboard
+                        navigate('/dashboard');
+                    }
+                } catch (profileError) {
+                    console.error('Error loading profile:', profileError);
+                    // Fallback to general dashboard if profile loading fails
+                    navigate('/dashboard');
+                }
             }
         } catch (err) {
             setError('An unexpected error occurred. Please try again.');
