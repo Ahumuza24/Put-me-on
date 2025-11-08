@@ -58,8 +58,8 @@ const ProviderLayout: React.FC<ProviderLayoutProps> = ({
             )}>
                 {/* Top Header */}
                 <div className="sticky top-0 z-30 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
-                    <div className="flex items-center justify-between px-4 py-4 lg:px-6">
-                        <div className="flex items-center space-x-4">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 px-3 sm:px-4 py-3 sm:py-4 lg:px-6">
+                        <div className="flex items-center space-x-3 sm:space-x-4 w-full sm:w-auto">
                             <Button
                                 variant="ghost"
                                 size="sm"
@@ -69,16 +69,16 @@ const ProviderLayout: React.FC<ProviderLayoutProps> = ({
                                 <Menu className="h-5 w-5" />
                             </Button>
                             
-                            <div>
-                                <h1 className="text-2xl font-bold">{title}</h1>
+                            <div className="min-w-0 flex-1 sm:flex-none">
+                                <h1 className="text-xl sm:text-2xl font-bold truncate">{title}</h1>
                                 {description && (
-                                    <p className="text-sm text-muted-foreground">{description}</p>
+                                    <p className="text-xs sm:text-sm text-muted-foreground truncate">{description}</p>
                                 )}
                             </div>
                         </div>
                         
                         {actions && (
-                            <div className="flex items-center space-x-2">
+                            <div className="flex items-center space-x-2 w-full sm:w-auto justify-end">
                                 {actions}
                             </div>
                         )}
@@ -86,7 +86,7 @@ const ProviderLayout: React.FC<ProviderLayoutProps> = ({
                 </div>
 
                 {/* Page Content */}
-                <main className="p-4 lg:p-6">
+                <main className="p-3 sm:p-4 lg:p-6">
                     {children}
                 </main>
             </div>

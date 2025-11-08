@@ -28,19 +28,18 @@ const Footer = () => {
             transition={{ duration: 0.6 }}
             className='bg-background border-t'
         >
-            <div className='max-w-7xl mx-auto px-5 py-16'>
-                <div className='grid md:grid-cols-4 gap-8'>
+            <div className='max-w-7xl mx-auto px-4 sm:px-5 py-12 sm:py-16'>
+                <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-12'>
                     {/* Brand Section */}
-                    <div className='md:col-span-2'>
-                        <Link to='/' className='flex items-center gap-2 mb-1'>
+                    <div className='sm:col-span-2 lg:col-span-2'>
+                        <Link to='/' className='flex items-center gap-2 mb-4'>
                             <img
                                 src="/Pmo.png"
                                 alt="PutMeOn logo"
-                                className="w-40 h-40 object-contain"
+                                className="w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 object-contain"
                             />
-
                         </Link>
-                        <p className='text-muted-foreground mb-6 max-w-md'>
+                        <p className='text-muted-foreground mb-6 max-w-md text-sm sm:text-base'>
                             Connect with top local talent for all your service needs. From web development to event planning, find verified professionals in your area.
                         </p>
 
@@ -63,8 +62,8 @@ const Footer = () => {
 
                     {/* Quick Links */}
                     <div>
-                        <h3 className='font-semibold mb-4'>Quick Links</h3>
-                        <ul className='space-y-3'>
+                        <h3 className='font-semibold mb-4 text-sm sm:text-base'>Quick Links</h3>
+                        <ul className='space-y-2 sm:space-y-3'>
                             {quickLinks.map((link, index) => (
                                 <motion.li
                                     key={index}
@@ -73,7 +72,7 @@ const Footer = () => {
                                 >
                                     <Link
                                         to={link.href}
-                                        className='text-muted-foreground hover:text-primary transition-colors'
+                                        className='text-muted-foreground hover:text-primary transition-colors text-sm sm:text-base'
                                     >
                                         {link.name}
                                     </Link>
@@ -84,8 +83,8 @@ const Footer = () => {
 
                     {/* Contact Info */}
                     <div>
-                        <h3 className='font-semibold mb-4'>Get in Touch</h3>
-                        <div className='space-y-3 text-muted-foreground'>
+                        <h3 className='font-semibold mb-4 text-sm sm:text-base'>Get in Touch</h3>
+                        <div className='space-y-2 sm:space-y-3 text-muted-foreground text-sm sm:text-base'>
                             <p>support@putmeon.com</p>
                             <p>+256 712 345 678</p>
                             <p>Plot 394</p>
@@ -101,12 +100,12 @@ const Footer = () => {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.6, delay: 0.3 }}
-                    className='mt-12 pt-8 border-t flex flex-col md:flex-row justify-between items-center gap-4'
+                    className='mt-8 sm:mt-12 pt-6 sm:pt-8 border-t flex flex-col sm:flex-row justify-between items-center gap-3 sm:gap-4'
                 >
-                    <p className='text-muted-foreground text-sm'>
+                    <p className='text-muted-foreground text-xs sm:text-sm text-center sm:text-left'>
                         © 2025 PutMeOn. All rights reserved.
                     </p>
-                    <div className='flex gap-6 text-sm text-muted-foreground'>
+                    <div className='flex gap-4 sm:gap-6 text-xs sm:text-sm text-muted-foreground'>
                         <Link to='/terms' className='hover:text-primary transition-colors'>
                             Terms
                         </Link>

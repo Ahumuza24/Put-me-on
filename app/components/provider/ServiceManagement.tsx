@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { 
     Plus, 
     Edit, 
@@ -12,7 +12,9 @@ import {
     Search,
     Filter,
     Grid,
-    List
+    List,
+    X,
+    Image as ImageIcon
 } from 'lucide-react'
 import { Button } from '~/components/ui/button'
 import { Input } from '~/components/ui/input'
@@ -31,6 +33,15 @@ import {
 import ProviderLayout from './ProviderLayout'
 import UserAvatar from './UserAvatar'
 import { useAuth } from '~/context/AuthContext'
+import { 
+    createImagePreview, 
+    revokeImagePreview, 
+    validateImageFile,
+    uploadImageToStorage,
+    uploadMultipleImages,
+    deleteImageFromStorage,
+    type UploadedImage 
+} from '~/lib/image-upload'
 
 interface ServiceManagementProps {
     // No props needed - will use useAuth hook internally
@@ -125,16 +136,205 @@ const ServiceManagement: React.FC<ServiceManagementProps> = () => {
         priceType: 'hourly',
         duration: '',
         tags: [],
+        images: [],
         status: 'draft'
     })
 
     const [newTag, setNewTag] = useState('')
+    const [uploadingImages, setUploadingImages] = useState(false)
+    const [uploadProgress, setUploadProgress] = useState<Record<string, number>>({})
+    const [imageErrors, setImageErrors] = useState<string[]>([])
+    const [imageFiles, setImageFiles] = useState<Map<string, File>>(new Map()) // Store file objects for upload
+    const fileInputRef = useRef<HTMLInputElement>(null)
+
+    // Cleanup blob URLs on unmount
+    useEffect(() => {
+        return () => {
+            // Cleanup blob URLs when component unmounts
+            // This prevents memory leaks from unreleased object URLs
+            services.forEach(service => {
+                service.images?.forEach(url => {
+                    if (url?.startsWith('blob:')) {
+                        revokeImagePreview(url)
+                    }
+                })
+            })
+        }
+    }, [])
+
+    // Handle image selection
+    const handleImageSelect = async (files: FileList | null) => {
+        if (!files || files.length === 0) return
+
+        setImageErrors([])
+        const errors: string[] = []
+        const validFiles: File[] = []
+        const newPreviewUrls: string[] = []
+
+        // Validate and process each file
+        Array.from(files).forEach((file) => {
+            const validation = validateImageFile(file)
+            if (!validation.isValid) {
+                errors.push(`${file.name}: ${validation.error}`)
+                return
+            }
+
+            validFiles.push(file)
+            const preview = createImagePreview(file)
+            newPreviewUrls.push(preview)
+            
+            // Store file reference with preview URL as key
+            setImageFiles(prev => {
+                const newMap = new Map(prev)
+                newMap.set(preview, file)
+                return newMap
+            })
+        })
+
+        if (errors.length > 0) {
+            setImageErrors(errors)
+        }
+
+        if (validFiles.length === 0) return
+
+        // Update service images with preview URLs (will be replaced with actual URLs after upload)
+        if (isCreating) {
+            setNewService(prev => ({
+                ...prev,
+                images: [...(prev.images || []), ...newPreviewUrls]
+            }))
+        } else if (editingService) {
+            setEditingService(prev => prev ? {
+                ...prev,
+                images: [...(prev.images || []), ...newPreviewUrls]
+            } : null)
+        }
+    }
+
+    // Remove image
+    const handleRemoveImage = async (index: number) => {
+        const currentImages = isCreating 
+            ? newService.images || [] 
+            : editingService?.images || []
+
+        const imageUrl = currentImages[index]
+        
+        // If it's an uploaded image (not a blob URL), delete from storage
+        if (imageUrl && !imageUrl.startsWith('blob:') && imageUrl.includes('supabase.co')) {
+            try {
+                await deleteImageFromStorage(imageUrl)
+            } catch (error) {
+                console.error('Error deleting image from storage:', error)
+                // Continue with removal from UI even if storage deletion fails
+            }
+        }
+
+        // Revoke preview URL if it's a blob URL
+        if (imageUrl?.startsWith('blob:')) {
+            revokeImagePreview(imageUrl)
+            // Remove from imageFiles map
+            setImageFiles(prev => {
+                const newMap = new Map(prev)
+                newMap.delete(imageUrl)
+                return newMap
+            })
+        }
+
+        // Remove from array
+        const updatedImages = currentImages.filter((_, i) => i !== index)
+
+        if (isCreating) {
+            setNewService(prev => ({
+                ...prev,
+                images: updatedImages
+            }))
+        } else if (editingService) {
+            setEditingService(prev => prev ? {
+                ...prev,
+                images: updatedImages
+            } : null)
+        }
+    }
+
+    // Handle drag and drop
+    const handleDragOver = (e: React.DragEvent) => {
+        e.preventDefault()
+        e.stopPropagation()
+    }
+
+    const handleDrop = (e: React.DragEvent) => {
+        e.preventDefault()
+        e.stopPropagation()
+        handleImageSelect(e.dataTransfer.files)
+    }
 
     const handleCreateService = async () => {
+        if (!user?.id) {
+            setImageErrors(['You must be logged in to create a service'])
+            return
+        }
+
         setLoading(true)
+        setUploadingImages(true)
+        setImageErrors([])
+
         try {
-            // Simulate API call
-            await new Promise(resolve => setTimeout(resolve, 1000))
+            let uploadedImageUrls: string[] = []
+            const currentImages = newService.images || []
+
+            // Separate blob URLs (previews) from already uploaded URLs
+            const previewUrls = currentImages.filter(url => url.startsWith('blob:'))
+            const existingUrls = currentImages.filter(url => !url.startsWith('blob:'))
+
+            // Upload new images (blob URLs) to storage
+            if (previewUrls.length > 0) {
+                try {
+                    const filesToUpload = previewUrls
+                        .map(url => imageFiles.get(url))
+                        .filter((file): file is File => file !== undefined)
+
+                    if (filesToUpload.length > 0) {
+                        setUploadProgress({})
+                        
+                        uploadedImageUrls = await uploadMultipleImages(
+                            filesToUpload,
+                            'services',
+                            user.id,
+                            (file, progress, status) => {
+                                const previewUrl = previewUrls.find(url => imageFiles.get(url) === file)
+                                if (previewUrl) {
+                                    setUploadProgress(prev => ({
+                                        ...prev,
+                                        [previewUrl]: progress
+                                    }))
+                                }
+                            }
+                        )
+
+                        // Clean up preview URLs
+                        previewUrls.forEach(url => {
+                            revokeImagePreview(url)
+                            setImageFiles(prev => {
+                                const newMap = new Map(prev)
+                                newMap.delete(url)
+                                return newMap
+                            })
+                        })
+                    }
+                } catch (uploadError: any) {
+                    console.error('Error uploading images:', uploadError)
+                    setImageErrors([
+                        'Failed to upload some images. Please try again.',
+                        uploadError.message
+                    ])
+                    setLoading(false)
+                    setUploadingImages(false)
+                    return
+                }
+            }
+
+            // Combine existing URLs with newly uploaded URLs
+            const allImageUrls = [...existingUrls, ...uploadedImageUrls]
             
             const service: Service = {
                 id: Date.now(),
@@ -149,7 +349,7 @@ const ServiceManagement: React.FC<ServiceManagementProps> = () => {
                 bookings: 0,
                 rating: 0,
                 tags: newService.tags || [],
-                images: [],
+                images: allImageUrls,
                 createdAt: new Date().toISOString().split('T')[0]
             }
             
@@ -162,41 +362,138 @@ const ServiceManagement: React.FC<ServiceManagementProps> = () => {
                 priceType: 'hourly',
                 duration: '',
                 tags: [],
+                images: [],
                 status: 'draft'
             })
             setIsCreating(false)
-        } catch (error) {
+            setImageErrors([])
+            setUploadProgress({})
+            setImageFiles(new Map())
+        } catch (error: any) {
             console.error('Error creating service:', error)
+            setImageErrors([
+                'Failed to create service. Please try again.',
+                error.message || 'Unknown error occurred'
+            ])
         } finally {
             setLoading(false)
+            setUploadingImages(false)
         }
     }
 
     const handleUpdateService = async (service: Service) => {
+        if (!user?.id) {
+            setImageErrors(['You must be logged in to update a service'])
+            return
+        }
+
         setLoading(true)
+        setUploadingImages(true)
+        setImageErrors([])
+
         try {
-            // Simulate API call
-            await new Promise(resolve => setTimeout(resolve, 1000))
+            const currentImages = service.images || []
             
-            setServices(prev => prev.map(s => s.id === service.id ? service : s))
+            // Separate blob URLs (previews/new uploads) from already uploaded URLs
+            const previewUrls = currentImages.filter(url => url.startsWith('blob:'))
+            const existingUrls = currentImages.filter(url => !url.startsWith('blob:'))
+
+            let uploadedImageUrls: string[] = []
+
+            // Upload new images (blob URLs) to storage
+            if (previewUrls.length > 0) {
+                try {
+                    const filesToUpload = previewUrls
+                        .map(url => imageFiles.get(url))
+                        .filter((file): file is File => file !== undefined)
+
+                    if (filesToUpload.length > 0) {
+                        setUploadProgress({})
+                        
+                        uploadedImageUrls = await uploadMultipleImages(
+                            filesToUpload,
+                            'services',
+                            user.id,
+                            (file, progress, status) => {
+                                const previewUrl = previewUrls.find(url => imageFiles.get(url) === file)
+                                if (previewUrl) {
+                                    setUploadProgress(prev => ({
+                                        ...prev,
+                                        [previewUrl]: progress
+                                    }))
+                                }
+                            }
+                        )
+
+                        // Clean up preview URLs
+                        previewUrls.forEach(url => {
+                            revokeImagePreview(url)
+                            setImageFiles(prev => {
+                                const newMap = new Map(prev)
+                                newMap.delete(url)
+                                return newMap
+                            })
+                        })
+                    }
+                } catch (uploadError: any) {
+                    console.error('Error uploading images:', uploadError)
+                    setImageErrors([
+                        'Failed to upload some images. Please try again.',
+                        uploadError.message
+                    ])
+                    setLoading(false)
+                    setUploadingImages(false)
+                    return
+                }
+            }
+
+            // Combine existing URLs with newly uploaded URLs
+            const allImageUrls = [...existingUrls, ...uploadedImageUrls]
+            
+            const updatedService: Service = {
+                ...service,
+                images: allImageUrls
+            }
+            
+            setServices(prev => prev.map(s => s.id === service.id ? updatedService : s))
             setEditingService(null)
-        } catch (error) {
+            setImageErrors([])
+            setUploadProgress({})
+            setImageFiles(new Map())
+        } catch (error: any) {
             console.error('Error updating service:', error)
+            setImageErrors([
+                'Failed to update service. Please try again.',
+                error.message || 'Unknown error occurred'
+            ])
         } finally {
             setLoading(false)
+            setUploadingImages(false)
         }
     }
 
     const handleDeleteService = async (id: number) => {
-        if (window.confirm('Are you sure you want to delete this service?')) {
+        if (window.confirm('Are you sure you want to delete this service? This will also delete all associated images.')) {
             setLoading(true)
             try {
-                // Simulate API call
-                await new Promise(resolve => setTimeout(resolve, 1000))
+                // Find the service to get image URLs
+                const service = services.find(s => s.id === id)
                 
+                // Delete images from storage
+                if (service?.images && service.images.length > 0) {
+                    const deletePromises = service.images
+                        .filter(url => !url.startsWith('blob:') && url.includes('supabase.co'))
+                        .map(url => deleteImageFromStorage(url))
+                    
+                    await Promise.allSettled(deletePromises)
+                }
+                
+                // Remove service from list
                 setServices(prev => prev.filter(s => s.id !== id))
             } catch (error) {
                 console.error('Error deleting service:', error)
+                // Continue with deletion even if image cleanup fails
+                setServices(prev => prev.filter(s => s.id !== id))
             } finally {
                 setLoading(false)
             }
@@ -265,61 +562,75 @@ const ServiceManagement: React.FC<ServiceManagementProps> = () => {
             actions={actions}
         >
                 {/* Filters and Search */}
-                <div className="flex flex-col sm:flex-row gap-4 mb-6">
-                    <div className="flex-1">
-                        <div className="relative">
-                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                            <Input
-                                placeholder="Search services..."
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                className="pl-10"
-                            />
+                <div className="flex flex-col gap-3 sm:gap-4 mb-4 sm:mb-6">
+                    <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+                        <div className="flex-1">
+                            <div className="relative">
+                                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                                <Input
+                                    placeholder="Search services..."
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    className="pl-10 h-10 sm:h-11"
+                                />
+                            </div>
                         </div>
-                    </div>
-                    <Select value={filterCategory} onValueChange={setFilterCategory}>
-                        <SelectTrigger className="w-full sm:w-48">
-                            <SelectValue placeholder="Filter by category" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="all">All Categories</SelectItem>
-                            <SelectItem value="web-dev">Web Development</SelectItem>
-                            <SelectItem value="design">Graphic Design</SelectItem>
-                            <SelectItem value="events">Events & Weddings</SelectItem>
-                            <SelectItem value="writing">Content Writing</SelectItem>
-                            <SelectItem value="photography">Photography & Video</SelectItem>
-                            <SelectItem value="marketing">Marketing</SelectItem>
-                        </SelectContent>
-                    </Select>
-                    <div className="flex items-center space-x-2">
-                        <Button
-                            variant={viewMode === 'grid' ? 'default' : 'outline'}
-                            size="sm"
-                            onClick={() => setViewMode('grid')}
-                        >
-                            <Grid className="h-4 w-4" />
-                        </Button>
-                        <Button
-                            variant={viewMode === 'list' ? 'default' : 'outline'}
-                            size="sm"
-                            onClick={() => setViewMode('list')}
-                        >
-                            <List className="h-4 w-4" />
-                        </Button>
+                        <Select value={filterCategory} onValueChange={setFilterCategory}>
+                            <SelectTrigger className="w-full sm:w-48 h-10 sm:h-11">
+                                <SelectValue placeholder="Filter by category" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">All Categories</SelectItem>
+                                <SelectItem value="web-dev">Web Development</SelectItem>
+                                <SelectItem value="design">Graphic Design</SelectItem>
+                                <SelectItem value="events">Events & Weddings</SelectItem>
+                                <SelectItem value="writing">Content Writing</SelectItem>
+                                <SelectItem value="photography">Photography & Video</SelectItem>
+                                <SelectItem value="marketing">Marketing</SelectItem>
+                            </SelectContent>
+                        </Select>
+                        <div className="flex items-center space-x-2">
+                            <Button
+                                variant={viewMode === 'grid' ? 'default' : 'outline'}
+                                size="sm"
+                                onClick={() => setViewMode('grid')}
+                                className="h-10 sm:h-11"
+                            >
+                                <Grid className="h-4 w-4" />
+                            </Button>
+                            <Button
+                                variant={viewMode === 'list' ? 'default' : 'outline'}
+                                size="sm"
+                                onClick={() => setViewMode('list')}
+                                className="h-10 sm:h-11"
+                            >
+                                <List className="h-4 w-4" />
+                            </Button>
+                        </div>
                     </div>
                 </div>
 
                 {/* Services Grid/List */}
                 {viewMode === 'grid' ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                         {filteredServices.map((service) => (
                             <div
                                 key={service.id}
                             >
-                                <Card className="h-full">
+                                <Card className="h-full flex flex-col">
+                                    {/* Service Image */}
+                                    {service.images && service.images.length > 0 && (
+                                        <div className="relative h-48 w-full overflow-hidden rounded-t-lg">
+                                            <img
+                                                src={service.images[0]}
+                                                alt={service.title}
+                                                className="w-full h-full object-cover"
+                                            />
+                                        </div>
+                                    )}
                                     <CardHeader>
                                         <div className="flex justify-between items-start">
-                                            <div className="space-y-1">
+                                            <div className="space-y-1 flex-1 min-w-0">
                                                 <CardTitle className="text-lg">{service.title}</CardTitle>
                                                 <CardDescription className="line-clamp-2">
                                                     {service.description}
@@ -327,7 +638,7 @@ const ServiceManagement: React.FC<ServiceManagementProps> = () => {
                                             </div>
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
-                                                    <Button variant="ghost" size="sm">
+                                                    <Button variant="ghost" size="sm" className="flex-shrink-0">
                                                         <MoreVertical className="h-4 w-4" />
                                                     </Button>
                                                 </DropdownMenuTrigger>
@@ -360,7 +671,7 @@ const ServiceManagement: React.FC<ServiceManagementProps> = () => {
                                             </DropdownMenu>
                                         </div>
                                     </CardHeader>
-                                    <CardContent className="space-y-4">
+                                    <CardContent className="space-y-4 flex-1">
                                         <div className="flex items-center justify-between">
                                             <div className="flex items-center space-x-2">
                                                 <DollarSign className="h-4 w-4 text-muted-foreground" />
@@ -418,10 +729,20 @@ const ServiceManagement: React.FC<ServiceManagementProps> = () => {
                             >
                                 <Card>
                                     <CardContent className="p-6">
-                                        <div className="flex items-center justify-between">
-                                            <div className="flex-1 space-y-2">
-                                                <div className="flex items-center space-x-4">
-                                                    <h3 className="text-lg font-semibold">{service.title}</h3>
+                                        <div className="flex items-start gap-4">
+                                            {/* Service Image */}
+                                            {service.images && service.images.length > 0 && (
+                                                <div className="relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-lg">
+                                                    <img
+                                                        src={service.images[0]}
+                                                        alt={service.title}
+                                                        className="w-full h-full object-cover"
+                                                    />
+                                                </div>
+                                            )}
+                                            <div className="flex-1 min-w-0">
+                                                <div className="flex items-center justify-between gap-2 mb-2">
+                                                    <h3 className="text-lg font-semibold truncate">{service.title}</h3>
                                                     <Badge className={getStatusColor(service.status)}>
                                                         {service.status}
                                                     </Badge>
@@ -429,7 +750,11 @@ const ServiceManagement: React.FC<ServiceManagementProps> = () => {
                                                 <p className="text-muted-foreground line-clamp-2">
                                                     {service.description}
                                                 </p>
-                                                <div className="flex items-center space-x-6 text-sm text-muted-foreground">
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center justify-between mt-4 gap-4">
+                                            <div className="flex-1">
+                                                <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
                                                     <div className="flex items-center space-x-1">
                                                         <DollarSign className="h-4 w-4" />
                                                         <span>UGX {service.price.toLocaleString()}{service.priceType === 'hourly' ? '/hr' : ''}</span>
@@ -450,7 +775,7 @@ const ServiceManagement: React.FC<ServiceManagementProps> = () => {
                                                     )}
                                                 </div>
                                             </div>
-                                            <div className="flex items-center space-x-2">
+                                            <div className="flex items-center space-x-2 flex-shrink-0">
                                                 <Button
                                                     variant="outline"
                                                     size="sm"
@@ -673,12 +998,126 @@ const ServiceManagement: React.FC<ServiceManagementProps> = () => {
                                     </Button>
                                 </div>
                             </div>
+
+                            {/* Image Upload Section */}
+                            <div>
+                                <Label>Service Images</Label>
+                                <p className="text-xs text-muted-foreground mb-3">
+                                    Upload images to showcase your service (max 5MB per image)
+                                </p>
+                                
+                                {/* Error Messages */}
+                                {imageErrors.length > 0 && (
+                                    <div className="mb-3 p-3 bg-destructive/10 border border-destructive/20 rounded-md">
+                                        <ul className="text-xs text-destructive space-y-1">
+                                            {imageErrors.map((error, index) => (
+                                                <li key={index}>• {error}</li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                )}
+
+                                {/* Image Upload Area */}
+                                <div
+                                    onDragOver={handleDragOver}
+                                    onDrop={handleDrop}
+                                    className="border-2 border-dashed border-border rounded-lg p-6 text-center hover:border-primary/50 transition-colors cursor-pointer"
+                                    onClick={() => fileInputRef.current?.click()}
+                                >
+                                    <input
+                                        ref={fileInputRef}
+                                        type="file"
+                                        accept="image/*"
+                                        multiple
+                                        onChange={(e) => handleImageSelect(e.target.files)}
+                                        className="hidden"
+                                    />
+                                    <ImageIcon className="h-10 w-10 mx-auto mb-3 text-muted-foreground" />
+                                    <p className="text-sm font-medium mb-1">
+                                        Click to upload or drag and drop
+                                    </p>
+                                    <p className="text-xs text-muted-foreground">
+                                        PNG, JPG, GIF, WebP up to 5MB
+                                    </p>
+                                </div>
+
+                                {/* Image Preview Grid */}
+                                {(isCreating ? newService.images : editingService?.images || []).length > 0 && (
+                                    <div className="mt-4">
+                                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                                            {(isCreating ? newService.images : editingService?.images || []).map((imageUrl, index) => {
+                                                const progress = uploadProgress[imageUrl]
+                                                const isUploading = progress !== undefined && progress < 100
+                                                const isPreview = imageUrl.startsWith('blob:')
+                                                
+                                                return (
+                                                    <div key={index} className="relative group">
+                                                        <div className="aspect-square rounded-lg overflow-hidden border border-border bg-muted relative">
+                                                            <img
+                                                                src={imageUrl}
+                                                                alt={`Service image ${index + 1}`}
+                                                                className="w-full h-full object-cover"
+                                                            />
+                                                            {/* Upload Progress Overlay */}
+                                                            {isUploading && (
+                                                                <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                                                                    <div className="text-center">
+                                                                        <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
+                                                                        <p className="text-xs text-white">{Math.round(progress)}%</p>
+                                                                    </div>
+                                                                </div>
+                                                            )}
+                                                            {/* Preview Badge */}
+                                                            {isPreview && !isUploading && (
+                                                                <div className="absolute top-2 left-2">
+                                                                    <Badge variant="secondary" className="text-xs">
+                                                                        Preview
+                                                                    </Badge>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                        <button
+                                                            onClick={(e) => {
+                                                                e.stopPropagation()
+                                                                if (!isUploading) {
+                                                                    handleRemoveImage(index)
+                                                                }
+                                                            }}
+                                                            disabled={isUploading}
+                                                            className="absolute top-2 right-2 p-1.5 bg-destructive text-destructive-foreground rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-destructive/90 disabled:opacity-50 disabled:cursor-not-allowed"
+                                                            aria-label="Remove image"
+                                                        >
+                                                            <X className="h-4 w-4" />
+                                                        </button>
+                                                    </div>
+                                                )
+                                            })}
+                                        </div>
+                                        {uploadingImages && (
+                                            <p className="mt-2 text-xs text-muted-foreground text-center">
+                                                Uploading images... Please wait.
+                                            </p>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
                         </div>
 
                         <div className="flex justify-end space-x-4 mt-6">
                             <Button
                                 variant="outline"
                                 onClick={() => {
+                                    // Clean up preview images
+                                    const currentImages = isCreating 
+                                        ? newService.images || [] 
+                                        : editingService?.images || []
+                                    
+                                    currentImages.forEach(url => {
+                                        if (url.startsWith('blob:')) {
+                                            revokeImagePreview(url)
+                                        }
+                                    })
+                                    
                                     setIsCreating(false)
                                     setEditingService(null)
                                     setNewService({
@@ -689,9 +1128,14 @@ const ServiceManagement: React.FC<ServiceManagementProps> = () => {
                                         priceType: 'hourly',
                                         duration: '',
                                         tags: [],
+                                        images: [],
                                         status: 'draft'
                                     })
+                                    setImageErrors([])
+                                    setUploadProgress({})
+                                    setImageFiles(new Map())
                                 }}
+                                disabled={uploadingImages}
                             >
                                 Cancel
                             </Button>
@@ -703,9 +1147,13 @@ const ServiceManagement: React.FC<ServiceManagementProps> = () => {
                                         handleUpdateService(editingService)
                                     }
                                 }}
-                                disabled={loading}
+                                disabled={loading || uploadingImages}
                             >
-                                {loading ? 'Saving...' : (isCreating ? 'Create Service' : 'Update Service')}
+                                {uploadingImages 
+                                    ? 'Uploading Images...' 
+                                    : loading 
+                                        ? 'Saving...' 
+                                        : (isCreating ? 'Create Service' : 'Update Service')}
                             </Button>
                         </div>
                     </div>

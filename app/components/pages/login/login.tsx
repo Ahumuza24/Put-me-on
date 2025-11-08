@@ -58,13 +58,13 @@ const LoginForm: React.FC = () => {
     };
 
     return (
-        <div className='w-full max-w-md bg-background/95 backdrop-blur-md border border-border/50 shadow-2xl rounded-2xl p-8'>
-            <form className="space-y-6" onSubmit={handleSubmit}>
+        <div className='w-full max-w-md bg-background/95 backdrop-blur-md border border-border/50 shadow-2xl rounded-xl sm:rounded-2xl p-6 sm:p-8 mx-4'>
+            <form className="space-y-5 sm:space-y-6" onSubmit={handleSubmit}>
                 <div className="text-center">
-                    <h1 className="text-3xl font-bold bg-gradient-to-b from-foreground to-foreground/70 bg-clip-text text-transparent">
+                    <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-b from-foreground to-foreground/70 bg-clip-text text-transparent">
                         Welcome Back
                     </h1>
-                    <p className="text-muted-foreground mt-2">Sign in to your account</p>
+                    <p className="text-muted-foreground mt-2 text-sm sm:text-base">Sign in to your account</p>
                 </div>
 
                 {error && (
@@ -85,7 +85,7 @@ const LoginForm: React.FC = () => {
                                 type="email"
                                 placeholder='Enter your email'
                                 required
-                                className="pl-10"
+                                className="pl-10 h-11 sm:h-12 text-sm sm:text-base"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 disabled={loading}
@@ -104,7 +104,7 @@ const LoginForm: React.FC = () => {
                                 type="password"
                                 placeholder='Enter your password'
                                 required
-                                className="pl-10"
+                                className="pl-10 h-11 sm:h-12 text-sm sm:text-base"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 disabled={loading}
@@ -114,8 +114,8 @@ const LoginForm: React.FC = () => {
                     </div>
                 </div>
                 
-                <div className="flex items-center justify-between text-sm">
-                    <label className="flex items-center space-x-2">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-sm">
+                    <label className="flex items-center space-x-2 cursor-pointer">
                         <input 
                             type="checkbox" 
                             className="rounded border-border"
@@ -132,14 +132,14 @@ const LoginForm: React.FC = () => {
                 
                 <Button 
                     type="submit" 
-                    className="w-full" 
+                    className="w-full h-11 sm:h-12 text-sm sm:text-base" 
                     size="lg"
                     disabled={loading}
                 >
                     {loading ? 'Signing In...' : 'Sign In'}
                 </Button>
                 
-                <div className="text-center text-sm text-muted-foreground">
+                <div className="text-center text-xs sm:text-sm text-muted-foreground">
                     <p>
                         Don't have an account?{' '}
                         <Link to="/signup" className="text-primary hover:text-primary/80 font-medium">

@@ -1,21 +1,27 @@
+import { useState } from 'react'
 import { Link } from '@remix-run/react'
 import ThemeSwitcher from '~/components/theme-switcher'
+import MobileMenu from '~/components/MobileMenu'
 
 const Navbar = () => {
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+
     return (
-        <div className='sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b px-5 py-2 shadow-sm'>
-            <nav className='mx-auto flex max-w-7xl items-center justify-between'>
+        <div className='sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b shadow-sm'>
+            <nav className='mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-5 sm:py-3'>
                 <Link to='/' className='flex items-center gap-2'>
                     <img 
                         src="/Pmo.png" 
                         alt="PutMeOn logo" 
-                        className="w-12 h-12 object-contain"
+                        className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 object-contain"
                     />
-                    <span className='hidden text-lg font-semibold md:block'>
+                    {/* <span className='text-base sm:text-lg font-semibold'>
                         PutMeOn
-                    </span>
+                    </span> */}
                 </Link>
-                <div className='hidden md:flex items-center space-x-8'>
+                
+                {/* Desktop Navigation */}
+                <div className='hidden lg:flex items-center space-x-6 xl:space-x-8'>
                     <Link to='/' className='text-sm font-medium hover:text-primary transition-colors'>
                         Home
                     </Link>
@@ -35,21 +41,31 @@ const Navbar = () => {
                         Contact
                     </Link>
                 </div>
-                <div className='flex items-center gap-3'>
+                
+                {/* Desktop Actions */}
+                <div className='hidden lg:flex items-center gap-3'>
                     <ThemeSwitcher />
                     <Link 
                         to='/signup' 
-                        className='hidden sm:inline-flex h-9 px-4 py-2 bg-primary text-primary-foreground hover:bg-primary/90 rounded-md text-sm font-medium transition-colors'
+                        className='inline-flex h-9 px-4 py-2 bg-primary text-primary-foreground hover:bg-primary/90 rounded-md text-sm font-medium transition-colors'
                     >
                         Get Started
                     </Link>
-                    
                     <Link 
                         to='/login' 
-                        className='hidden sm:inline-flex h-9 px-4 py-2 bg-primary text-primary-foreground hover:bg-primary/90 rounded-md text-sm font-medium transition-colors'
+                        className='inline-flex h-9 px-4 py-2 bg-primary text-primary-foreground hover:bg-primary/90 rounded-md text-sm font-medium transition-colors'
                     >
                         Login
                     </Link>
+                </div>
+
+                {/* Mobile Actions */}
+                <div className='flex lg:hidden items-center gap-2'>
+                    <ThemeSwitcher />
+                    <MobileMenu 
+                        isOpen={mobileMenuOpen} 
+                        onToggle={() => setMobileMenuOpen(!mobileMenuOpen)} 
+                    />
                 </div>
             </nav>
         </div>

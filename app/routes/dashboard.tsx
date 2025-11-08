@@ -1,8 +1,6 @@
 import { useAuth } from '~/context/AuthContext';
 import { Button } from '~/components/ui/button';
-import { useNavigate } from '@remix-run/react';
 import { Link } from '@remix-run/react';
-;
 import { 
     User, 
     Briefcase, 
@@ -18,11 +16,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/com
 
 export default function Dashboard() {
     const { user, profile, signOut } = useAuth();
-    const navigate = useNavigate();
 
     const handleSignOut = async () => {
-        await signOut();
-        navigate('/login');
+        const { error } = await signOut();
+        if (!error) {
+            // Use window.location for a hard redirect to bypass route guards
+            // This ensures we get to the landing page without ProtectedRoute interfering
+            window.location.href = '/';
+        }
     };
 
     // Get user type from profile or default to provider

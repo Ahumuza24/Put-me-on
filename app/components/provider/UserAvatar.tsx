@@ -1,12 +1,10 @@
 import React from 'react'
 import { Link } from '@remix-run/react'
-import { motion } from 'framer-motion'
 import { 
     User, 
     Settings, 
     LogOut, 
     ChevronDown,
-    Mail,
     MapPin,
     Briefcase
 } from 'lucide-react'
@@ -30,7 +28,12 @@ const UserAvatar: React.FC<UserAvatarProps> = ({ className }) => {
     const { user, profile, signOut } = useAuth()
 
     const handleSignOut = async () => {
-        await signOut()
+        const { error } = await signOut()
+        if (!error) {
+            // Use window.location for a hard redirect to bypass route guards
+            // This ensures we get to the landing page without ProtectedRoute interfering
+            window.location.href = '/'
+        }
     }
 
     // Get user initials from full name or email
