@@ -19,7 +19,6 @@ import {
 } from 'lucide-react'
 import { Button } from '~/components/ui/button'
 import { cn } from '~/lib/utils'
-import AdminUserAvatar from './AdminUserAvatar'
 
 interface AdminSidebarProps {
     isOpen: boolean
@@ -211,19 +210,6 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
                         })}
                     </nav>
 
-                    {/* User Avatar at Bottom */}
-                    {!isCollapsed && (
-                        <div className="p-4 border-t">
-                            <AdminUserAvatar />
-                        </div>
-                    )}
-                    
-                    {/* Collapsed Avatar */}
-                    {isCollapsed && (
-                        <div className="p-4 border-t">
-                            <AdminUserAvatar className="justify-center px-2" />
-                        </div>
-                    )}
                 </div>
             </aside>
         </>

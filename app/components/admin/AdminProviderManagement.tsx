@@ -28,6 +28,7 @@ import {
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/ui/select'
 import { profileStorage, type UserProfile } from '~/lib/profile-storage'
 import { servicesStorage } from '~/lib/services-storage'
+import { StatsCardSkeleton, TableSkeleton, Skeleton } from '~/components/ui/skeletons'
 
 const AdminProviderManagement: React.FC = () => {
     const [providers, setProviders] = useState<UserProfile[]>([])
@@ -125,8 +126,17 @@ const AdminProviderManagement: React.FC = () => {
 
     if (loading) {
         return (
-            <div className="flex items-center justify-center min-h-screen">
-                <div className="animate-spin rounded-full h-32 w-32 border-2 border-primary"></div>
+            <div className="space-y-6">
+                <div>
+                    <Skeleton className="h-8 w-64 mb-2" />
+                    <Skeleton className="h-5 w-96" />
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    {Array.from({ length: 4 }).map((_, i) => (
+                        <StatsCardSkeleton key={i} />
+                    ))}
+                </div>
+                <TableSkeleton rows={8} columns={6} />
             </div>
         )
     }

@@ -14,6 +14,7 @@ import { Button } from '~/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/ui/select'
 import { Badge } from '~/components/ui/badge'
 import { bookingsStorage, type Booking } from '~/lib/bookings-storage'
+import { StatsCardSkeleton, Skeleton } from '~/components/ui/skeletons'
 
 interface EarningsData {
     totalRevenue: number
@@ -202,8 +203,24 @@ const AdminEarnings: React.FC = () => {
 
     if (loading) {
         return (
-            <div className="flex items-center justify-center min-h-screen">
-                <div className="animate-spin rounded-full h-32 w-32 border-2 border-primary"></div>
+            <div className="space-y-6">
+                <div>
+                    <Skeleton className="h-8 w-64 mb-2" />
+                    <Skeleton className="h-5 w-96" />
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    {Array.from({ length: 4 }).map((_, i) => (
+                        <StatsCardSkeleton key={i} />
+                    ))}
+                </div>
+                <Card>
+                    <CardHeader>
+                        <Skeleton className="h-6 w-48" />
+                    </CardHeader>
+                    <CardContent>
+                        <Skeleton className="h-64 w-full" />
+                    </CardContent>
+                </Card>
             </div>
         )
     }

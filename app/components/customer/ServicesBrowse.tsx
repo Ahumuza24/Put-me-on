@@ -22,6 +22,8 @@ import { Button } from '~/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/components/ui/card'
 import { Badge } from '~/components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/ui/select'
+import { ServiceCardSkeleton } from '~/components/ui/skeletons'
+import { Skeleton } from '~/components/ui/skeleton'
 import { 
     DropdownMenu, 
     DropdownMenuContent, 
@@ -34,7 +36,6 @@ import { Textarea } from '~/components/ui/textarea'
 import { servicesStorage, type Service } from '~/lib/services-storage'
 import { profileStorage, type UserProfile } from '~/lib/profile-storage'
 import { useAuth } from '~/context/AuthContext'
-import { useNavigate } from '@remix-run/react'
 
 interface ServiceWithProvider extends Service {
     provider?: {
@@ -57,7 +58,6 @@ interface ServiceCategory {
 
 const ServicesBrowse: React.FC = () => {
     const { user, profile } = useAuth()
-    const navigate = useNavigate()
     const [services, setServices] = useState<ServiceWithProvider[]>([])
     const [categories, setCategories] = useState<ServiceCategory[]>([])
     const [filteredServices, setFilteredServices] = useState<ServiceWithProvider[]>([])
@@ -182,10 +182,7 @@ const ServicesBrowse: React.FC = () => {
     }
 
     const handleMessageProvider = (service: ServiceWithProvider) => {
-        if (!user || !profile) {
-            navigate('/login?redirect=/services')
-            return
-        }
+        // User is guaranteed to be authenticated since route is protected
         setSelectedService(service)
         setShowMessageModal(true)
     }
@@ -229,25 +226,46 @@ const ServicesBrowse: React.FC = () => {
 
     if (loading) {
         return (
-            <div className="flex items-center justify-center min-h-screen">
-                <div className="animate-spin rounded-full h-32 w-32 border-2 border-primary"></div>
+            <div className="min-h-screen bg-background">
+                {/* Header Skeleton */}
+                <div className="bg-muted/50 border-b">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+                        <Skeleton className="h-10 w-64 mb-2" />
+                        <Skeleton className="h-5 w-96" />
+                    </div>
+                </div>
+
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+                    {/* Filters Skeleton */}
+                    <div className="space-y-4 mb-6">
+                        <Skeleton className="h-12 w-full" />
+                        <div className="flex flex-wrap items-center gap-4">
+                            <Skeleton className="h-10 w-48" />
+                            <Skeleton className="h-10 w-48" />
+                            <Skeleton className="h-10 w-48" />
+                            <Skeleton className="h-10 w-20" />
+                        </div>
+                        <Skeleton className="h-5 w-32" />
+                    </div>
+
+                    {/* Services Grid Skeleton */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {Array.from({ length: 6 }).map((_, i) => (
+                            <ServiceCardSkeleton key={i} />
+                        ))}
+                    </div>
+                </div>
             </div>
         )
     }
 
     return (
         <div className="min-h-screen bg-background">
-            {/* Header */}
-            <div className="bg-muted/50 border-b">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-                    <h1 className="text-3xl font-bold mb-2">Browse Services</h1>
-                    <p className="text-muted-foreground">
-                        Find the perfect service provider for your needs
-                    </p>
-                </div>
-            </div>
-
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+                <p className="text-muted-foreground mb-6">
+                    Find the perfect service provider for your needs
+                </p>
+
                 {/* Filters and Search */}
                 <div className="space-y-4 mb-6">
                     {/* Search Bar */}

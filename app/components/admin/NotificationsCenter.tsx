@@ -15,6 +15,7 @@ import { Button } from '~/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/ui/select'
 import { profileStorage, type UserProfile } from '~/lib/profile-storage'
 import { supabase } from '~/lib/supabase.client'
+import { Skeleton } from '~/components/ui/skeletons'
 
 interface Notification {
     id: string
@@ -156,8 +157,27 @@ const NotificationsCenter: React.FC = () => {
 
     if (loading) {
         return (
-            <div className="flex items-center justify-center min-h-screen">
-                <div className="animate-spin rounded-full h-32 w-32 border-2 border-primary"></div>
+            <div className="space-y-6">
+                <div>
+                    <Skeleton className="h-8 w-64 mb-2" />
+                    <Skeleton className="h-5 w-96" />
+                </div>
+                <div className="space-y-4">
+                    {Array.from({ length: 10 }).map((_, i) => (
+                        <Card key={i}>
+                            <CardContent className="p-6">
+                                <div className="flex items-start space-x-4">
+                                    <Skeleton className="h-10 w-10 rounded-full" />
+                                    <div className="flex-1 space-y-2">
+                                        <Skeleton className="h-5 w-3/4" />
+                                        <Skeleton className="h-4 w-full" />
+                                        <Skeleton className="h-3 w-32" />
+                                    </div>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    ))}
+                </div>
             </div>
         )
     }

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from '@remix-run/react';
+import { Link, useSearchParams } from '@remix-run/react';
 import { User, Lock, AlertCircle } from 'lucide-react';
 import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
@@ -13,7 +13,8 @@ const LoginForm: React.FC = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [rememberMe, setRememberMe] = useState(false);
-    const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
+    const redirectParam = searchParams.get('redirect');
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -30,15 +31,34 @@ const LoginForm: React.FC = () => {
                 setError(signInError.message);
                 setLoading(false);
             } else if (data.user) {
-                // Login successful - check user profile and redirect based on role
+                // Login successful - check user profile and redirect based on role or redirect parameter
                 try {
                     const profile = await profileStorage.getByUserId(data.user.id);
                     
                     // Determine redirect path
                     let redirectPath = '/services'; // Default for clients
                     
-                    if (profile) {
-                        // Redirect based on user type
+                    // If there's a redirect parameter, use it (unless user is admin/provider who should go to their dashboard)
+                    if (redirectParam) {
+                        const decodedRedirect = decodeURIComponent(redirectParam);
+                        // Only use redirect param for clients, or if it's a valid admin/provider route
+                        if (profile) {
+                            if (profile.userType === 'admin' || profile.userType === 'super_admin') {
+                                // Admins always go to admin dashboard, ignore redirect param
+                                redirectPath = '/admin/dashboard';
+                            } else if (profile.userType === 'provider') {
+                                // Providers always go to provider dashboard, ignore redirect param
+                                redirectPath = '/provider/dashboard';
+                            } else {
+                                // Clients can use the redirect parameter
+                                redirectPath = decodedRedirect;
+                            }
+                        } else {
+                            // No profile yet, use redirect param
+                            redirectPath = decodedRedirect;
+                        }
+                    } else if (profile) {
+                        // No redirect param, use default based on user type
                         if (profile.userType === 'admin' || profile.userType === 'super_admin') {
                             redirectPath = '/admin/dashboard';
                         } else if (profile.userType === 'provider') {
@@ -53,9 +73,10 @@ const LoginForm: React.FC = () => {
                     }, 100);
                 } catch (profileError) {
                     console.error('Error loading profile:', profileError);
-                    // Fallback to services page if profile loading fails (assume client)
+                    // Fallback: use redirect param if available, otherwise services page
+                    const fallbackPath = redirectParam ? decodeURIComponent(redirectParam) : '/services';
                     setTimeout(() => {
-                        window.location.href = '/services';
+                        window.location.href = fallbackPath;
                     }, 100);
                 }
             }

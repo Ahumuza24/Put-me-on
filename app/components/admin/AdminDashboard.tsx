@@ -21,6 +21,7 @@ import { profileStorage, type UserProfile } from '~/lib/profile-storage'
 import { servicesStorage, type Service } from '~/lib/services-storage'
 import { bookingsStorage, type Booking } from '~/lib/bookings-storage'
 import { supabase } from '~/lib/supabase.client'
+import { DashboardSkeleton } from '~/components/ui/skeletons'
 
 interface DashboardStats {
     totalUsers: number
@@ -220,11 +221,7 @@ const AdminDashboard: React.FC = () => {
     }
 
     if (loading) {
-        return (
-            <div className="flex items-center justify-center min-h-screen">
-                <div className="animate-spin rounded-full h-32 w-32 border-2 border-primary"></div>
-            </div>
-        )
+        return <DashboardSkeleton />
     }
 
     return (

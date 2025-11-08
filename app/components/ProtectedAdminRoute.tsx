@@ -1,5 +1,6 @@
 import { useAuth } from '~/context/AuthContext';
 import { Navigate } from '@remix-run/react';
+import { PageSkeleton } from '~/components/ui/skeletons';
 
 interface ProtectedAdminRouteProps {
     children: React.ReactNode;
@@ -9,11 +10,7 @@ export function ProtectedAdminRoute({ children }: ProtectedAdminRouteProps) {
     const { user, profile, loading } = useAuth();
 
     if (loading) {
-        return (
-            <div className="flex items-center justify-center min-h-screen">
-                <div className="animate-spin rounded-full h-32 w-32 border-2 border-primary"></div>
-            </div>
-        );
+        return <PageSkeleton />;
     }
 
     // Check if user is authenticated

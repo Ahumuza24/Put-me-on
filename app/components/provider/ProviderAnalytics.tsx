@@ -24,6 +24,7 @@ import { Progress } from '~/components/ui/progress'
 import ProviderLayout from './ProviderLayout'
 import UserAvatar from './UserAvatar'
 import { useAuth } from '~/context/AuthContext'
+import { StatsCardSkeleton, Skeleton } from '~/components/ui/skeletons'
 
 interface ProviderAnalyticsProps {
     // No props needed - will use useAuth hook internally
@@ -234,10 +235,29 @@ const ProviderAnalytics: React.FC<ProviderAnalyticsProps> = () => {
                 description="Track your performance and growth"
                 actions={actions}
             >
-                <div className="flex items-center justify-center h-64">
-                    <div className="text-center">
-                        <RefreshCw className="h-8 w-8 animate-spin mx-auto mb-4" />
-                        <p className="text-muted-foreground">Loading analytics data...</p>
+                <div className="space-y-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        {Array.from({ length: 4 }).map((_, i) => (
+                            <StatsCardSkeleton key={i} />
+                        ))}
+                    </div>
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <Card>
+                            <CardHeader>
+                                <Skeleton className="h-6 w-48" />
+                            </CardHeader>
+                            <CardContent>
+                                <Skeleton className="h-64 w-full" />
+                            </CardContent>
+                        </Card>
+                        <Card>
+                            <CardHeader>
+                                <Skeleton className="h-6 w-48" />
+                            </CardHeader>
+                            <CardContent>
+                                <Skeleton className="h-64 w-full" />
+                            </CardContent>
+                        </Card>
                     </div>
                 </div>
             </ProviderLayout>

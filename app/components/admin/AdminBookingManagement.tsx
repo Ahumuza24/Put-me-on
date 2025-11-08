@@ -25,6 +25,7 @@ import {
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/ui/select'
 import { Textarea } from '~/components/ui/textarea'
 import { bookingsStorage, type Booking } from '~/lib/bookings-storage'
+import { BookingCardSkeleton, Skeleton } from '~/components/ui/skeletons'
 
 const AdminBookingManagement: React.FC = () => {
     const [bookings, setBookings] = useState<Booking[]>([])
@@ -126,8 +127,20 @@ const AdminBookingManagement: React.FC = () => {
 
     if (loading) {
         return (
-            <div className="flex items-center justify-center min-h-screen">
-                <div className="animate-spin rounded-full h-32 w-32 border-2 border-primary"></div>
+            <div className="space-y-6">
+                <div>
+                    <Skeleton className="h-8 w-64 mb-2" />
+                    <Skeleton className="h-5 w-96" />
+                </div>
+                <div className="flex gap-4">
+                    <Skeleton className="h-10 flex-1" />
+                    <Skeleton className="h-10 w-32" />
+                </div>
+                <div className="space-y-4">
+                    {Array.from({ length: 6 }).map((_, i) => (
+                        <BookingCardSkeleton key={i} />
+                    ))}
+                </div>
             </div>
         )
     }

@@ -3,6 +3,7 @@ import { Menu } from 'lucide-react'
 import { Button } from '~/components/ui/button'
 import { cn } from '~/lib/utils'
 import AdminSidebar from './AdminSidebar'
+import AdminUserAvatar from './AdminUserAvatar'
 
 interface AdminLayoutProps {
     children: React.ReactNode
@@ -77,11 +78,17 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
                             </div>
                         </div>
                         
-                        {actions && (
-                            <div className="flex items-center space-x-2 w-full sm:w-auto justify-end">
-                                {actions}
+                        <div className="flex items-center space-x-3 sm:space-x-4 w-full sm:w-auto justify-end">
+                            {actions && (
+                                <div className="flex items-center space-x-2">
+                                    {actions}
+                                </div>
+                            )}
+                            {/* User Avatar in Navbar */}
+                            <div className="flex items-center">
+                                <AdminUserAvatar className="navbar" />
                             </div>
-                        )}
+                        </div>
                     </div>
                 </div>
 
