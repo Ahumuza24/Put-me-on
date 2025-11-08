@@ -28,33 +28,39 @@ const LoginForm: React.FC = () => {
 
             if (signInError) {
                 setError(signInError.message);
+                setLoading(false);
             } else if (data.user) {
                 // Login successful - check user profile and redirect based on role
                 try {
                     const profile = await profileStorage.getByUserId(data.user.id);
                     
+                    // Determine redirect path
+                    let redirectPath = '/services'; // Default for clients
+                    
                     if (profile) {
                         // Redirect based on user type
                         if (profile.userType === 'admin' || profile.userType === 'super_admin') {
-                            navigate('/admin/dashboard');
+                            redirectPath = '/admin/dashboard';
                         } else if (profile.userType === 'provider') {
-                            navigate('/provider/dashboard');
-                        } else {
-                            navigate('/dashboard');
+                            redirectPath = '/provider/dashboard';
                         }
-                    } else {
-                        // No profile found, redirect to general dashboard
-                        navigate('/dashboard');
                     }
+                    
+                    // Use setTimeout to allow React to complete the current render cycle
+                    // Then use window.location for a hard redirect to avoid DOM conflicts
+                    setTimeout(() => {
+                        window.location.href = redirectPath;
+                    }, 100);
                 } catch (profileError) {
                     console.error('Error loading profile:', profileError);
-                    // Fallback to general dashboard if profile loading fails
-                    navigate('/dashboard');
+                    // Fallback to services page if profile loading fails (assume client)
+                    setTimeout(() => {
+                        window.location.href = '/services';
+                    }, 100);
                 }
             }
         } catch (err) {
             setError('An unexpected error occurred. Please try again.');
-        } finally {
             setLoading(false);
         }
     };

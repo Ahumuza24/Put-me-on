@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from '@remix-run/react';
+import { Link } from '@remix-run/react';
 import { User, Mail, Lock, Phone, MapPin, Briefcase, AlertCircle, CheckCircle } from 'lucide-react';
 import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
@@ -24,7 +24,6 @@ const SignupForm: React.FC = () => {
     const [success, setSuccess] = useState('');
     
     const { signUp, refreshProfile } = useAuth();
-    const navigate = useNavigate();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -172,13 +171,16 @@ const SignupForm: React.FC = () => {
                 setTermsAccepted(false);
                 
                 // Redirect to appropriate dashboard based on user type
+                // Use setTimeout to allow React to complete the current render cycle
+                // Then use window.location for a hard redirect to avoid DOM conflicts
                 setTimeout(() => {
                     if (userType === 'provider') {
-                        navigate('/provider/dashboard');
+                        window.location.href = '/provider/dashboard';
                     } else {
-                        navigate('/dashboard');
+                        // Clients are redirected to services page
+                        window.location.href = '/services';
                     }
-                }, 2000);
+                }, 1500);
             }
         } catch (err) {
             console.error('Unexpected signup error:', err)

@@ -154,43 +154,75 @@ export const servicesStorage = {
     // Get all active services (for public browsing)
     getAllActive: async (categoryId?: string): Promise<Service[]> => {
         try {
+            // First get all services
             let query = supabase
                 .from('services')
-                .select(`
-                    *,
-                    service_categories!inner(name, slug),
-                    user_profiles!inner(full_name, rating, completed_jobs, avatar_url)
-                `)
+                .select('*')
                 .eq('is_active', true)
 
             if (categoryId) {
                 query = query.eq('category_id', categoryId)
             }
 
-            const { data, error } = await query.order('created_at', { ascending: false })
+            const { data: servicesData, error: servicesError } = await query.order('created_at', { ascending: false })
 
-            if (error) {
-                console.error('Error fetching services:', error)
-                throw error
+            if (servicesError) {
+                console.error('Error fetching services:', servicesError)
+                throw servicesError
             }
 
-            return data.map(service => ({
-                id: service.id,
-                providerId: service.provider_id,
-                title: service.title,
-                description: service.description,
-                categoryId: service.category_id,
-                categoryName: service.service_categories.name,
-                priceType: service.price_type,
-                price: service.price,
-                durationHours: service.duration_hours,
-                tags: service.tags,
-                images: service.images,
-                isActive: service.is_active,
-                featured: service.featured,
-                createdAt: service.created_at,
-                updatedAt: service.updated_at
-            }))
+            // Get categories for each service
+            const servicesWithCategories: Service[] = []
+            
+            for (const service of servicesData) {
+                try {
+                    // Get category
+                    const { data: categoryData } = await supabase
+                        .from('service_categories')
+                        .select('name, slug')
+                        .eq('id', service.category_id)
+                        .single()
+
+                    servicesWithCategories.push({
+                        id: service.id,
+                        providerId: service.provider_id,
+                        title: service.title,
+                        description: service.description,
+                        categoryId: service.category_id,
+                        categoryName: categoryData?.name,
+                        priceType: service.price_type,
+                        price: service.price,
+                        durationHours: service.duration_hours,
+                        tags: service.tags || [],
+                        images: service.images || [],
+                        isActive: service.is_active,
+                        featured: service.featured,
+                        createdAt: service.created_at,
+                        updatedAt: service.updated_at
+                    })
+                } catch (error) {
+                    console.error(`Error processing service ${service.id}:`, error)
+                    // Still add the service without category info
+                    servicesWithCategories.push({
+                        id: service.id,
+                        providerId: service.provider_id,
+                        title: service.title,
+                        description: service.description,
+                        categoryId: service.category_id,
+                        priceType: service.price_type,
+                        price: service.price,
+                        durationHours: service.duration_hours,
+                        tags: service.tags || [],
+                        images: service.images || [],
+                        isActive: service.is_active,
+                        featured: service.featured,
+                        createdAt: service.created_at,
+                        updatedAt: service.updated_at
+                    })
+                }
+            }
+
+            return servicesWithCategories
         } catch (error) {
             console.error('Error fetching services:', error)
             return []

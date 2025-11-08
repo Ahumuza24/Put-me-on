@@ -15,7 +15,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onToggle }) => {
     const navItems = [
         { name: 'Home', href: '/' },
         { name: 'How it Works', href: '/how-it-works' },
-        { name: 'Browse Services', href: '/browse' },
+        { name: 'Browse Services', href: '/services' },
         { name: 'Become a Provider', href: '/become-provider' },
         { name: 'About Us', href: '/about' },
         { name: 'Contact', href: '/contact' },
