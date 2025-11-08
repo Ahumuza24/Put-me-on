@@ -327,5 +327,116 @@ export const bookingsStorage = {
             console.error('Error fetching booking:', error)
             return null
         }
+    },
+
+    // Get all bookings (for admin)
+    getAll: async (): Promise<Booking[]> => {
+        try {
+            // First, get all bookings
+            const { data: bookingsData, error: bookingsError } = await supabase
+                .from('bookings')
+                .select('*')
+                .order('created_at', { ascending: false })
+
+            if (bookingsError) {
+                console.error('Error fetching all bookings:', bookingsError)
+                throw bookingsError
+            }
+
+            // Then, fetch related data for each booking
+            const bookingsWithDetails: Booking[] = []
+            
+            for (const booking of bookingsData) {
+                try {
+                    // Get service details
+                    const { data: serviceData } = await supabase
+                        .from('services')
+                        .select('id, title, description, price, price_type')
+                        .eq('id', booking.service_id)
+                        .single()
+
+                    // Get client details
+                    const { data: clientData } = await supabase
+                        .from('user_profiles')
+                        .select('id, full_name, email, phone, location')
+                        .eq('user_id', booking.client_id)
+                        .single()
+
+                    // Get provider details
+                    const { data: providerData } = await supabase
+                        .from('user_profiles')
+                        .select('id, full_name, email, phone, location, rating')
+                        .eq('user_id', booking.provider_id)
+                        .single()
+
+                    bookingsWithDetails.push({
+                        id: booking.id,
+                        clientId: booking.client_id,
+                        providerId: booking.provider_id,
+                        serviceId: booking.service_id,
+                        status: booking.status,
+                        title: booking.title,
+                        description: booking.description,
+                        budget: booking.budget,
+                        startDate: booking.start_date,
+                        endDate: booking.end_date,
+                        estimatedHours: booking.estimated_hours,
+                        actualHours: booking.actual_hours,
+                        clientNotes: booking.client_notes,
+                        providerNotes: booking.provider_notes,
+                        createdAt: booking.created_at,
+                        updatedAt: booking.updated_at,
+                        service: serviceData ? {
+                            id: serviceData.id,
+                            title: serviceData.title,
+                            description: serviceData.description,
+                            price: serviceData.price,
+                            priceType: serviceData.price_type
+                        } : undefined,
+                        client: clientData ? {
+                            id: clientData.id,
+                            fullName: clientData.full_name,
+                            email: clientData.email,
+                            phone: clientData.phone,
+                            location: clientData.location
+                        } : undefined,
+                        provider: providerData ? {
+                            id: providerData.id,
+                            fullName: providerData.full_name,
+                            email: providerData.email,
+                            phone: providerData.phone,
+                            location: providerData.location,
+                            rating: providerData.rating || 0
+                        } : undefined
+                    })
+                } catch (error) {
+                    console.error(`Error fetching details for booking ${booking.id}:`, error)
+                    // Still add the booking without full details
+                    bookingsWithDetails.push({
+                        id: booking.id,
+                        clientId: booking.client_id,
+                        providerId: booking.provider_id,
+                        serviceId: booking.service_id,
+                        status: booking.status,
+                        title: booking.title,
+                        description: booking.description,
+                        budget: booking.budget,
+                        startDate: booking.start_date,
+                        endDate: booking.end_date,
+                        estimatedHours: booking.estimated_hours,
+                        actualHours: booking.actual_hours,
+                        clientNotes: booking.client_notes,
+                        providerNotes: booking.provider_notes,
+                        createdAt: booking.created_at,
+                        updatedAt: booking.updated_at
+                    })
+                }
+            }
+
+            return bookingsWithDetails
+        } catch (error) {
+            console.error('Error fetching all bookings:', error)
+            return []
+        }
     }
 }

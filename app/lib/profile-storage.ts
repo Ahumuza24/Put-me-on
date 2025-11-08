@@ -8,7 +8,7 @@ export interface UserProfile {
     email: string
     phone: string
     location: string
-    userType: 'client' | 'provider'
+    userType: 'client' | 'provider' | 'admin' | 'super_admin'
     serviceCategory?: string
     bio?: string
     hourlyRate?: number

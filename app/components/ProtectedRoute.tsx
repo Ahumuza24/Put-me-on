@@ -1,5 +1,6 @@
 import { useAuth } from '~/context/AuthContext';
-import { Navigate } from '@remix-run/react';
+import { Navigate, useLocation } from '@remix-run/react';
+import { PageSkeleton } from '~/components/ui/skeletons';
 
 interface ProtectedRouteProps {
     children: React.ReactNode;
@@ -7,17 +8,16 @@ interface ProtectedRouteProps {
 
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
     const { user, loading } = useAuth();
+    const location = useLocation();
 
     if (loading) {
-        return (
-            <div className="flex items-center justify-center min-h-screen">
-                <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
-            </div>
-        );
+        return <PageSkeleton />;
     }
 
     if (!user) {
-        return <Navigate to="/login" replace />;
+        // Preserve the current location so we can redirect back after login
+        const redirectTo = encodeURIComponent(location.pathname + location.search);
+        return <Navigate to={`/login?redirect=${redirectTo}`} replace />;
     }
 
     return <>{children}</>;

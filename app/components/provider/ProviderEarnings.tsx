@@ -35,6 +35,7 @@ import {
 import ProviderLayout from './ProviderLayout'
 import UserAvatar from './UserAvatar'
 import { useAuth } from '~/context/AuthContext'
+import { StatsCardSkeleton, Skeleton } from '~/components/ui/skeletons'
 
 interface ProviderEarningsProps {
     // No props needed - will use useAuth hook internally
@@ -303,11 +304,24 @@ const ProviderEarnings: React.FC<ProviderEarningsProps> = () => {
                 description="Track your payments and revenue"
                 actions={actions}
             >
-                <div className="flex items-center justify-center h-64">
-                    <div className="text-center">
-                        <RefreshCw className="h-8 w-8 animate-spin mx-auto mb-4" />
-                        <p className="text-muted-foreground">Loading earnings data...</p>
+                <div className="space-y-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        {Array.from({ length: 4 }).map((_, i) => (
+                            <StatsCardSkeleton key={i} />
+                        ))}
                     </div>
+                    <Card>
+                        <CardHeader>
+                            <Skeleton className="h-6 w-48" />
+                        </CardHeader>
+                        <CardContent>
+                            <div className="space-y-4">
+                                <Skeleton className="h-8 w-full" />
+                                <Skeleton className="h-8 w-5/6" />
+                                <Skeleton className="h-48 w-full" />
+                            </div>
+                        </CardContent>
+                    </Card>
                 </div>
             </ProviderLayout>
         )

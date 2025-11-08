@@ -136,15 +136,15 @@ const ProviderDashboard: React.FC<ProviderDashboardProps> = () => {
         >
 
                 {/* Stats Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
                     <div>
                         <Card>
                             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                <CardTitle className="text-sm font-medium">Total Earnings</CardTitle>
+                                <CardTitle className="text-xs sm:text-sm font-medium">Total Earnings</CardTitle>
                                 <DollarSign className="h-4 w-4 text-muted-foreground" />
                             </CardHeader>
                             <CardContent>
-                                <div className="text-2xl font-bold">UGX {stats.totalEarnings.toLocaleString()}</div>
+                                <div className="text-xl sm:text-2xl font-bold truncate">UGX {stats.totalEarnings.toLocaleString()}</div>
                                 <p className="text-xs text-muted-foreground">
                                     +12% from last month
                                 </p>
@@ -155,11 +155,11 @@ const ProviderDashboard: React.FC<ProviderDashboardProps> = () => {
                     <div>
                         <Card>
                             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                <CardTitle className="text-sm font-medium">Completed Jobs</CardTitle>
+                                <CardTitle className="text-xs sm:text-sm font-medium">Completed Jobs</CardTitle>
                                 <CheckCircle className="h-4 w-4 text-muted-foreground" />
                             </CardHeader>
                             <CardContent>
-                                <div className="text-2xl font-bold">{stats.completedJobs}</div>
+                                <div className="text-xl sm:text-2xl font-bold">{stats.completedJobs}</div>
                                 <p className="text-xs text-muted-foreground">
                                     +3 this week
                                 </p>
@@ -170,11 +170,11 @@ const ProviderDashboard: React.FC<ProviderDashboardProps> = () => {
                     <div>
                         <Card>
                             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                <CardTitle className="text-sm font-medium">Active Jobs</CardTitle>
+                                <CardTitle className="text-xs sm:text-sm font-medium">Active Jobs</CardTitle>
                                 <Clock className="h-4 w-4 text-muted-foreground" />
                             </CardHeader>
                             <CardContent>
-                                <div className="text-2xl font-bold">{stats.activeJobs}</div>
+                                <div className="text-xl sm:text-2xl font-bold">{stats.activeJobs}</div>
                                 <p className="text-xs text-muted-foreground">
                                     In progress
                                 </p>
@@ -185,11 +185,11 @@ const ProviderDashboard: React.FC<ProviderDashboardProps> = () => {
                     <div>
                         <Card>
                             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                <CardTitle className="text-sm font-medium">Average Rating</CardTitle>
+                                <CardTitle className="text-xs sm:text-sm font-medium">Average Rating</CardTitle>
                                 <Star className="h-4 w-4 text-muted-foreground" />
                             </CardHeader>
                             <CardContent>
-                                <div className="text-2xl font-bold">{stats.averageRating}</div>
+                                <div className="text-xl sm:text-2xl font-bold">{stats.averageRating}</div>
                                 <p className="text-xs text-muted-foreground">
                                     Based on {stats.completedJobs} reviews
                                 </p>
@@ -198,7 +198,7 @@ const ProviderDashboard: React.FC<ProviderDashboardProps> = () => {
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
                     {/* Recent Bookings */}
                     <div>
                         <Card>
@@ -275,30 +275,30 @@ const ProviderDashboard: React.FC<ProviderDashboardProps> = () => {
                 </div>
 
                 {/* Quick Actions */}
-                <div className="mt-8">
+                <div className="mt-6 sm:mt-8">
                     <Card>
                         <CardHeader>
-                            <CardTitle>Quick Actions</CardTitle>
-                            <CardDescription>
+                            <CardTitle className="text-base sm:text-lg">Quick Actions</CardTitle>
+                            <CardDescription className="text-xs sm:text-sm">
                                 Common tasks and shortcuts
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <Button variant="outline" className="h-20 flex-col" asChild>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+                                <Button variant="outline" className="h-16 sm:h-20 flex-col text-xs sm:text-sm" asChild>
                                     <Link to="/provider/services">
-                                        <Plus className="h-6 w-6 mb-2" />
+                                        <Plus className="h-5 w-5 sm:h-6 sm:w-6 mb-1 sm:mb-2" />
                                         Add New Service
                                     </Link>
                                 </Button>
-                                <Button variant="outline" className="h-20 flex-col" asChild>
+                                <Button variant="outline" className="h-16 sm:h-20 flex-col text-xs sm:text-sm" asChild>
                                     <Link to="/provider/profile">
-                                        <User className="h-6 w-6 mb-2" />
+                                        <User className="h-5 w-5 sm:h-6 sm:w-6 mb-1 sm:mb-2" />
                                         Update Profile
                                     </Link>
                                 </Button>
-                                <Button variant="outline" className="h-20 flex-col">
-                                    <TrendingUp className="h-6 w-6 mb-2" />
+                                <Button variant="outline" className="h-16 sm:h-20 flex-col text-xs sm:text-sm sm:col-span-2 lg:col-span-1">
+                                    <TrendingUp className="h-5 w-5 sm:h-6 sm:w-6 mb-1 sm:mb-2" />
                                     View Analytics
                                 </Button>
                             </div>

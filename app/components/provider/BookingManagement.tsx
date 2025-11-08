@@ -230,55 +230,55 @@ const BookingManagement: React.FC<BookingManagementProps> = () => {
             actions={actions}
         >
                 {/* Stats */}
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 mb-6 sm:mb-8">
                     <Card>
-                        <CardContent className="p-6">
+                        <CardContent className="p-4 sm:p-6">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-sm font-medium text-muted-foreground">Total Bookings</p>
-                                    <p className="text-2xl font-bold">{stats.total}</p>
+                                    <p className="text-xs sm:text-sm font-medium text-muted-foreground">Total Bookings</p>
+                                    <p className="text-xl sm:text-2xl font-bold">{stats.total}</p>
                                 </div>
-                                <Calendar className="h-8 w-8 text-muted-foreground" />
+                                <Calendar className="h-6 w-6 sm:h-8 sm:w-8 text-muted-foreground" />
                             </div>
                         </CardContent>
                     </Card>
                     <Card>
-                        <CardContent className="p-6">
+                        <CardContent className="p-4 sm:p-6">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-sm font-medium text-muted-foreground">Pending</p>
-                                    <p className="text-2xl font-bold">{stats.pending}</p>
+                                    <p className="text-xs sm:text-sm font-medium text-muted-foreground">Pending</p>
+                                    <p className="text-xl sm:text-2xl font-bold">{stats.pending}</p>
                                 </div>
-                                <Clock className="h-8 w-8 text-yellow-500" />
+                                <Clock className="h-6 w-6 sm:h-8 sm:w-8 text-yellow-500" />
                             </div>
                         </CardContent>
                     </Card>
                     <Card>
-                        <CardContent className="p-6">
+                        <CardContent className="p-4 sm:p-6">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-sm font-medium text-muted-foreground">In Progress</p>
-                                    <p className="text-2xl font-bold">{stats.inProgress}</p>
+                                    <p className="text-xs sm:text-sm font-medium text-muted-foreground">In Progress</p>
+                                    <p className="text-xl sm:text-2xl font-bold">{stats.inProgress}</p>
                                 </div>
-                                <AlertCircle className="h-8 w-8 text-purple-500" />
+                                <AlertCircle className="h-6 w-6 sm:h-8 sm:w-8 text-purple-500" />
                             </div>
                         </CardContent>
                     </Card>
                     <Card>
-                        <CardContent className="p-6">
+                        <CardContent className="p-4 sm:p-6">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-sm font-medium text-muted-foreground">Total Earnings</p>
-                                    <p className="text-2xl font-bold">${stats.totalEarnings.toLocaleString()}</p>
+                                    <p className="text-xs sm:text-sm font-medium text-muted-foreground">Total Earnings</p>
+                                    <p className="text-lg sm:text-2xl font-bold truncate">${stats.totalEarnings.toLocaleString()}</p>
                                 </div>
-                                <DollarSign className="h-8 w-8 text-green-500" />
+                                <DollarSign className="h-6 w-6 sm:h-8 sm:w-8 text-green-500" />
                             </div>
                         </CardContent>
                     </Card>
                 </div>
 
                 {/* Filters */}
-                <div className="flex flex-col sm:flex-row gap-4 mb-6">
+                <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-4 sm:mb-6">
                     <div className="flex-1">
                         <div className="relative">
                             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -286,12 +286,12 @@ const BookingManagement: React.FC<BookingManagementProps> = () => {
                                 placeholder="Search bookings..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                className="pl-10"
+                                className="pl-10 h-10 sm:h-11"
                             />
                         </div>
                     </div>
                     <Select value={filterStatus} onValueChange={setFilterStatus}>
-                        <SelectTrigger className="w-full sm:w-48">
+                        <SelectTrigger className="w-full sm:w-48 h-10 sm:h-11">
                             <SelectValue placeholder="Filter by status" />
                         </SelectTrigger>
                         <SelectContent>
@@ -306,27 +306,27 @@ const BookingManagement: React.FC<BookingManagementProps> = () => {
                 </div>
 
                 {/* Bookings List */}
-                <div className="space-y-4">
+                <div className="space-y-3 sm:space-y-4">
                     {filteredBookings.map((booking) => (
                         <div
                             key={booking.id}
                         >
                             <Card>
-                                <CardContent className="p-6">
-                                    <div className="flex items-start justify-between">
-                                        <div className="flex-1 space-y-4">
-                                            <div className="flex items-center space-x-4">
-                                                <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
-                                                    <User className="h-6 w-6 text-primary" />
+                                <CardContent className="p-4 sm:p-6">
+                                    <div className="flex flex-col sm:flex-row items-start justify-between gap-4">
+                                        <div className="flex-1 space-y-3 sm:space-y-4 w-full">
+                                            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
+                                                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+                                                    <User className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
                                                 </div>
-                                                <div>
-                                                    <h3 className="text-lg font-semibold">{booking.clientName}</h3>
-                                                    <p className="text-sm text-muted-foreground">{booking.clientEmail}</p>
+                                                <div className="flex-1 min-w-0">
+                                                    <h3 className="text-base sm:text-lg font-semibold truncate">{booking.clientName}</h3>
+                                                    <p className="text-xs sm:text-sm text-muted-foreground truncate">{booking.clientEmail}</p>
                                                 </div>
                                                 <Badge className={getStatusColor(booking.status)}>
                                                     <div className="flex items-center space-x-1">
                                                         {getStatusIcon(booking.status)}
-                                                        <span className="capitalize">{booking.status.replace('-', ' ')}</span>
+                                                        <span className="capitalize text-xs sm:text-sm">{booking.status.replace('-', ' ')}</span>
                                                     </div>
                                                 </Badge>
                                             </div>
@@ -336,18 +336,18 @@ const BookingManagement: React.FC<BookingManagementProps> = () => {
                                                 <p className="text-sm text-muted-foreground mt-1">{booking.description}</p>
                                             </div>
 
-                                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 text-xs sm:text-sm">
                                                 <div className="flex items-center space-x-2">
-                                                    <DollarSign className="h-4 w-4 text-muted-foreground" />
-                                                    <span className="font-semibold">UGX {booking.amount.toLocaleString()}</span>
+                                                    <DollarSign className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                                                    <span className="font-semibold truncate">UGX {booking.amount.toLocaleString()}</span>
                                                 </div>
                                                 <div className="flex items-center space-x-2">
-                                                    <Calendar className="h-4 w-4 text-muted-foreground" />
-                                                    <span>{booking.startDate} - {booking.endDate}</span>
+                                                    <Calendar className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                                                    <span className="truncate">{booking.startDate} - {booking.endDate}</span>
                                                 </div>
-                                                <div className="flex items-center space-x-2">
-                                                    <Clock className="h-4 w-4 text-muted-foreground" />
-                                                    <span>Created {booking.createdAt}</span>
+                                                <div className="flex items-center space-x-2 sm:col-span-2 lg:col-span-1">
+                                                    <Clock className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                                                    <span className="truncate">Created {booking.createdAt}</span>
                                                 </div>
                                             </div>
 
@@ -366,22 +366,24 @@ const BookingManagement: React.FC<BookingManagementProps> = () => {
                                             )}
                                         </div>
 
-                                        <div className="flex flex-col space-y-2 ml-4">
+                                        <div className="flex flex-row sm:flex-col space-x-2 sm:space-x-0 sm:space-y-2 w-full sm:w-auto sm:ml-4">
                                             <Button
                                                 variant="outline"
                                                 size="sm"
                                                 onClick={() => setSelectedBooking(booking)}
+                                                className="flex-1 sm:flex-none text-xs sm:text-sm"
                                             >
                                                 <MessageSquare className="h-4 w-4 mr-2" />
                                                 Message
                                             </Button>
                                             
                                             {booking.status === 'pending' && (
-                                                <div className="flex space-x-2">
+                                                <div className="flex space-x-2 flex-1 sm:flex-none">
                                                     <Button
                                                         size="sm"
                                                         onClick={() => handleStatusChange(booking.id, 'accepted')}
                                                         disabled={loading}
+                                                        className="flex-1 sm:flex-none text-xs sm:text-sm"
                                                     >
                                                         Accept
                                                     </Button>
@@ -390,6 +392,7 @@ const BookingManagement: React.FC<BookingManagementProps> = () => {
                                                         size="sm"
                                                         onClick={() => handleStatusChange(booking.id, 'cancelled')}
                                                         disabled={loading}
+                                                        className="flex-1 sm:flex-none text-xs sm:text-sm"
                                                     >
                                                         Decline
                                                     </Button>
@@ -401,6 +404,7 @@ const BookingManagement: React.FC<BookingManagementProps> = () => {
                                                     size="sm"
                                                     onClick={() => handleStatusChange(booking.id, 'in-progress')}
                                                     disabled={loading}
+                                                    className="flex-1 sm:flex-none text-xs sm:text-sm"
                                                 >
                                                     Start Work
                                                 </Button>
@@ -411,6 +415,7 @@ const BookingManagement: React.FC<BookingManagementProps> = () => {
                                                     size="sm"
                                                     onClick={() => handleStatusChange(booking.id, 'completed')}
                                                     disabled={loading}
+                                                    className="flex-1 sm:flex-none text-xs sm:text-sm"
                                                 >
                                                     Mark Complete
                                                 </Button>
@@ -418,7 +423,7 @@ const BookingManagement: React.FC<BookingManagementProps> = () => {
 
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
-                                                    <Button variant="ghost" size="sm">
+                                                    <Button variant="ghost" size="sm" className="flex-shrink-0">
                                                         <MoreVertical className="h-4 w-4" />
                                                     </Button>
                                                 </DropdownMenuTrigger>

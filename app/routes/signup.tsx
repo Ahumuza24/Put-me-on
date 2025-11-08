@@ -17,7 +17,7 @@ export const meta: MetaFunction = () => {
 
 export default function Signup() {
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/20 via-background to-primary/10 px-4 py-8">
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/20 via-background to-primary/10 px-4 py-8 sm:py-12">
             <SignupForm />
         </div>
     )

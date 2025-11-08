@@ -1,8 +1,8 @@
+import { useEffect } from 'react';
+import { useNavigate } from '@remix-run/react';
 import { useAuth } from '~/context/AuthContext';
 import { Button } from '~/components/ui/button';
-import { useNavigate } from '@remix-run/react';
 import { Link } from '@remix-run/react';
-;
 import { 
     User, 
     Briefcase, 
@@ -17,12 +17,29 @@ import {
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/components/ui/card';
 
 export default function Dashboard() {
-    const { user, profile, signOut } = useAuth();
+    const { user, profile, signOut, loading } = useAuth();
     const navigate = useNavigate();
 
+    // Redirect clients to services page
+    useEffect(() => {
+        if (!loading && user && profile) {
+            if (profile.userType === 'client') {
+                navigate('/services', { replace: true });
+            } else if (profile.userType === 'provider') {
+                navigate('/provider/dashboard', { replace: true });
+            } else if (profile.userType === 'admin' || profile.userType === 'super_admin') {
+                navigate('/admin/dashboard', { replace: true });
+            }
+        }
+    }, [user, profile, loading, navigate]);
+
     const handleSignOut = async () => {
-        await signOut();
-        navigate('/login');
+        const { error } = await signOut();
+        if (!error) {
+            // Use window.location for a hard redirect to bypass route guards
+            // This ensures we get to the landing page without ProtectedRoute interfering
+            window.location.href = '/';
+        }
     };
 
     // Get user type from profile or default to provider
