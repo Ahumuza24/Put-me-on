@@ -17,7 +17,9 @@ const AuthRedirect: React.FC<AuthRedirectProps> = ({ children }) => {
             const timer = setTimeout(() => {
                 if (profile) {
                     // Redirect based on user type
-                    if (profile.userType === 'provider') {
+                    if (profile.userType === 'admin' || profile.userType === 'super_admin') {
+                        navigate('/admin/dashboard', { replace: true })
+                    } else if (profile.userType === 'provider') {
                         navigate('/provider/dashboard', { replace: true })
                     } else {
                         navigate('/dashboard', { replace: true })

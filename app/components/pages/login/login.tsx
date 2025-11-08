@@ -35,7 +35,9 @@ const LoginForm: React.FC = () => {
                     
                     if (profile) {
                         // Redirect based on user type
-                        if (profile.userType === 'provider') {
+                        if (profile.userType === 'admin' || profile.userType === 'super_admin') {
+                            navigate('/admin/dashboard');
+                        } else if (profile.userType === 'provider') {
                             navigate('/provider/dashboard');
                         } else {
                             navigate('/dashboard');
