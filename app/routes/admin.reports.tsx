@@ -1,26 +1,26 @@
 import { type MetaFunction } from '@remix-run/node'
 import { ProtectedAdminRoute } from '~/components/ProtectedAdminRoute'
 import AdminLayout from '~/components/admin/AdminLayout'
-import AdminSettings from '~/components/admin/AdminSettings'
+import AdminReports from '~/components/admin/AdminReports'
 
 export const meta: MetaFunction = () => {
     return [
-        { title: 'Settings - Admin Dashboard' },
+        { title: 'Reports - Admin Dashboard' },
         {
             name: 'description',
-            content: 'Platform settings and configuration.',
+            content: 'Generate and export platform reports.',
         },
     ]
 }
 
-export default function AdminSettingsRoute() {
+export default function AdminReportsRoute() {
     return (
         <ProtectedAdminRoute>
             <AdminLayout
-                title="Settings"
-                description="Platform settings and configuration"
+                title="Reports"
+                description="Generate and export platform reports"
             >
-                <AdminSettings />
+                <AdminReports />
             </AdminLayout>
         </ProtectedAdminRoute>
     )

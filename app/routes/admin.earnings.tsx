@@ -1,7 +1,7 @@
 import { type MetaFunction } from '@remix-run/node'
 import { ProtectedAdminRoute } from '~/components/ProtectedAdminRoute'
 import AdminLayout from '~/components/admin/AdminLayout'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/components/ui/card'
+import AdminEarnings from '~/components/admin/AdminEarnings'
 
 export const meta: MetaFunction = () => {
     return [
@@ -20,17 +20,7 @@ export default function AdminEarningsRoute() {
                 title="Earnings"
                 description="Platform earnings and financial insights"
             >
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Earnings & Financials</CardTitle>
-                        <CardDescription>This section is under development</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <p className="text-muted-foreground">
-                            Earnings and financial insights will be available here.
-                        </p>
-                    </CardContent>
-                </Card>
+                <AdminEarnings />
             </AdminLayout>
         </ProtectedAdminRoute>
     )

@@ -86,10 +86,22 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
             description: 'User messages'
         },
         {
+            name: 'Analytics',
+            href: '/admin/analytics',
+            icon: BarChart3,
+            description: 'Platform analytics'
+        },
+        {
             name: 'Settings',
             href: '/admin/settings',
             icon: Settings,
             description: 'Platform settings'
+        },
+        {
+            name: 'Reports',
+            href: '/admin/reports',
+            icon: FileText,
+            description: 'Export reports'
         },
     ]
 

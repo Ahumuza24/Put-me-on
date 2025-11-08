@@ -139,28 +139,35 @@ const AdminDashboard: React.FC = () => {
 
             const newUsersThisWeek = profiles.filter(p => {
                 const created = new Date(p.createdAt)
-                return created >= weekAgo
+                return created >= weekAgo && created <= now
             }).length
 
             const newUsersThisMonth = profiles.filter(p => {
                 const created = new Date(p.createdAt)
-                return created >= monthAgo
+                return created >= monthAgo && created <= now
             }).length
 
-            // Load services (mock data for now - you'll need to implement getAll services)
-            const services: Service[] = [] // TODO: Implement servicesStorage.getAll()
+            // Load services
+            const services = await servicesStorage.getAll()
             const activeServices = services.filter(s => s.isActive).length
 
-            // Load bookings (mock data for now)
-            const bookings: Booking[] = [] // TODO: Implement bookingsStorage.getAll()
+            // Load bookings
+            const bookings = await bookingsStorage.getAll()
             const activeBookings = bookings.filter(b => 
                 ['pending', 'accepted', 'in_progress'].includes(b.status)
             ).length
             const completedBookings = bookings.filter(b => b.status === 'completed').length
 
-            // Calculate earnings (mock - you'll need to implement payment tracking)
-            const totalEarnings = 0 // TODO: Calculate from bookings
-            const monthlyEarnings = 0 // TODO: Calculate from bookings this month
+            // Calculate earnings from completed bookings (10% platform fee)
+            const completedBookingsList = bookings.filter(b => b.status === 'completed')
+            const totalEarnings = completedBookingsList.reduce((sum, b) => sum + b.budget, 0)
+            
+            // Monthly earnings
+            const monthStart = new Date(now.getFullYear(), now.getMonth(), 1)
+            const monthlyBookings = completedBookingsList.filter(b => 
+                new Date(b.createdAt) >= monthStart
+            )
+            const monthlyEarnings = monthlyBookings.reduce((sum, b) => sum + b.budget, 0)
 
             // Pending verifications
             const pendingVerifications = profiles.filter(p => !p.verified).length

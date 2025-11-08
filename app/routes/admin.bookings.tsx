@@ -1,7 +1,7 @@
 import { type MetaFunction } from '@remix-run/node'
 import { ProtectedAdminRoute } from '~/components/ProtectedAdminRoute'
 import AdminLayout from '~/components/admin/AdminLayout'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/components/ui/card'
+import AdminBookingManagement from '~/components/admin/AdminBookingManagement'
 
 export const meta: MetaFunction = () => {
     return [
@@ -20,17 +20,7 @@ export default function AdminBookingsRoute() {
                 title="Bookings"
                 description="Manage all platform bookings"
             >
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Bookings Management</CardTitle>
-                        <CardDescription>This section is under development</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <p className="text-muted-foreground">
-                            Booking management features will be available here.
-                        </p>
-                    </CardContent>
-                </Card>
+                <AdminBookingManagement />
             </AdminLayout>
         </ProtectedAdminRoute>
     )

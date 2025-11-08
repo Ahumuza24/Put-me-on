@@ -1,7 +1,7 @@
 import { type MetaFunction } from '@remix-run/node'
 import { ProtectedAdminRoute } from '~/components/ProtectedAdminRoute'
 import AdminLayout from '~/components/admin/AdminLayout'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/components/ui/card'
+import AdminProviderManagement from '~/components/admin/AdminProviderManagement'
 
 export const meta: MetaFunction = () => {
     return [
@@ -20,17 +20,7 @@ export default function AdminProvidersRoute() {
                 title="Providers"
                 description="Manage all service providers"
             >
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Providers Management</CardTitle>
-                        <CardDescription>This section is under development</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <p className="text-muted-foreground">
-                            Provider management features will be available here.
-                        </p>
-                    </CardContent>
-                </Card>
+                <AdminProviderManagement />
             </AdminLayout>
         </ProtectedAdminRoute>
     )

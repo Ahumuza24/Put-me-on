@@ -268,5 +268,45 @@ export const servicesStorage = {
             console.error('Error deleting service:', error)
             return false
         }
+    },
+
+    // Get all services (for admin)
+    getAll: async (): Promise<Service[]> => {
+        try {
+            const { data, error } = await supabase
+                .from('services')
+                .select(`
+                    *,
+                    service_categories!inner(name, slug),
+                    user_profiles!inner(full_name, email)
+                `)
+                .order('created_at', { ascending: false })
+
+            if (error) {
+                console.error('Error fetching all services:', error)
+                throw error
+            }
+
+            return data.map(service => ({
+                id: service.id,
+                providerId: service.provider_id,
+                title: service.title,
+                description: service.description,
+                categoryId: service.category_id,
+                categoryName: service.service_categories?.name,
+                priceType: service.price_type,
+                price: service.price,
+                durationHours: service.duration_hours,
+                tags: service.tags,
+                images: service.images,
+                isActive: service.is_active,
+                featured: service.featured,
+                createdAt: service.created_at,
+                updatedAt: service.updated_at
+            }))
+        } catch (error) {
+            console.error('Error fetching all services:', error)
+            return []
+        }
     }
 }
